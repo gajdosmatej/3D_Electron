@@ -9,7 +9,10 @@
   function load(){
 
     var graphics = new GraphicsControl(document.getElementById("cnv"));
-    var cube = new Cube(50,40,15);
+    var camera = new Camera();
+    var plane = new ProjectionPlane(window.innerWidth, window.innerHeight);
+
+    var cube = new Cube(50,40,15,25);
 
     graphics.drawSquare(cube.x,cube.y,cube.side_len);
 

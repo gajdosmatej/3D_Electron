@@ -2,12 +2,13 @@ class Cube{
   x;
   y;
   z;
-  side_len = 20;
+  side_len;
 
-  constructor(x, y, z) {
+  constructor(x, y, z, len) {
     this.x = x;
     this.y = y;
     this.z = z;
+    this.side_len = len;
   }
 
 }
@@ -39,13 +40,12 @@ class ProjectionPlane{
 
   width;
   height;
-  distance;
+  distance = 100;
 
-  constructor(w,h,d){
+  constructor(w,h){
 
     this.width = w;
     this.height = h;
-    this.distance = d;
 
   }
 
