@@ -1,12 +1,10 @@
-const { app, BrowserWindow } = require('electron')  //moduly pro Electron
+const { app, BrowserWindow } = require('electron');  //moduly pro Electron
 
 function createWindow () {
-  const win = new BrowserWindow({
-    width: 800,
-    height: 600
-  })
-
-  win.loadFile('index.html')
+  const win = new BrowserWindow({show: false});
+  win.maximize();
+  win.show();
+  win.loadFile('index.html');
 }
 
 app.whenReady().then(() => {

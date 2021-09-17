@@ -2,15 +2,16 @@
 <head>
 <meta charset="utf-8">
 
+<script src="classes.js"></script>
 <script language="javascript">
+
 
   function load(){
 
-    var CNV = document.getElementById("cnv");
-    var ctx = CNV.getContext("2d");
-    ctx.beginPath();
-    ctx.arc(100, 75, 50, 0, 2 * Math.PI);
-    ctx.stroke(); 
+    var graphics = new GraphicsControl(document.getElementById("cnv"));
+    var cube = new Cube(50,40,15);
+
+    graphics.drawSquare(cube.x,cube.y,cube.side_len);
 
   }
 
