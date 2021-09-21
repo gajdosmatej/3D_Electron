@@ -11,6 +11,18 @@ class Cube{
     this.side_len = len;
   }
 
+  *getVerticesCoordinates(){
+
+      for(let x_modifier = -0.5; x_modifier <= 0.5; x_modifier++){
+          for(let y_modifier = -0.5; y_modifier <= 0.5; y_modifier++){
+              for(let z_modifier = -0.5; z_modifier <= 0.5; z_modifier++){
+
+                  yield [this.x + x_modifier * this.side_len, this.y + y_modifier * this.side_len, this.z + z_modifier * this.side_len]
+              }
+          }
+      }
+  }
+
 }
 
 

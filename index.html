@@ -12,7 +12,8 @@
     var camera = new Camera();
     var plane = new ProjectionPlane(window.innerWidth, window.innerHeight);
 
-    var cube = new Cube(50,40,15,25);
+    var cube = new Cube(50,40,15,30);
+    for( obj of cube.getVerticesCoordinates() ){  console.log(obj);  }
 
     graphics.drawSquare(cube.x,cube.y,cube.side_len);
 
