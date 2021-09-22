@@ -3,24 +3,32 @@ class Cube{
   y;
   z;
   side_len;
+  phi;
 
-  constructor(x, y, z, len) {
+  constructor(x, y, z, len, phi=0) {
     this.x = x;
     this.y = y;
     this.z = z;
     this.side_len = len;
+    this.phi = phi;
   }
 
   *getVerticesCoordinates(){
+      console.log(this.phi);
+      for(let y_modifier of [-1, 1]){
+          for(let point_reflection of [-1, 1]){
+              for(let goniometric_sign of [-1, 1]){
 
-      for(let x_modifier = -0.5; x_modifier <= 0.5; x_modifier++){
-          for(let y_modifier = -0.5; y_modifier <= 0.5; y_modifier++){
-              for(let z_modifier = -0.5; z_modifier <= 0.5; z_modifier++){
+                var goniometric_x = Math.cos(this.phi) + goniometric_sign * Math.sin(this.phi);
+                var goniometric_z = Math.cos(this.phi) - goniometric_sign * Math.sin(this.phi);
 
-                  yield [this.x + x_modifier * this.side_len, this.y + y_modifier * this.side_len, this.z + z_modifier * this.side_len]
-              }
-          }
-      }
+                var position_vector =
+                [ this.x + point_reflection * this.side_len / 2 * goniometric_x,
+                  this.y + y_modifier * this.side_len / 2,
+                  this.z + goniometric_sign * point_reflection * this.side_len / 2 * goniometric_z];
+
+                yield position_vector;
+      }}}
   }
 
 }
