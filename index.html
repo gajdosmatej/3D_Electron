@@ -8,11 +8,15 @@
 
   function load(){
 
-    var graphics = new GraphicsControl(document.getElementById("cnv"));
+    var can = document.getElementById("cnv");
+    can.width = 0.96*window.innerWidth;
+    can.height = 0.96*window.innerHeight;
+
+    var graphics = new GraphicsControl(can);
     var camera = new Camera();
     var plane = new ProjectionPlane(window.innerWidth, window.innerHeight);
 
-    var cube = new Cube(70,0,0,30, Math.PI / 4);
+    var cube = new Cube(100,0,40,60, Math.PI / 3);
   //  for( obj of cube.getVerticesCoordinates() ){  console.log(obj);  }
 /*
     for(  obj of cube.getRelativeVerticesCoordinates() ){
@@ -34,7 +38,7 @@
 </head>
 <body onload="load();">
 
-<canvas id="cnv" style="width: 100%; height: 100%;">
+<canvas id="cnv" style="border: solid 1px;">
 
 </body>
 </html>

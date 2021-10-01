@@ -61,12 +61,13 @@ class GraphicsControl{
 
   canvas;
   ctx;
-  offset = [40, 40];
+  offset;
 
   constructor(canvas){
 
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
+    this.offset = [canvas.width / 2, canvas.height / 2];
 
   }
 
@@ -83,6 +84,28 @@ class GraphicsControl{
     this.ctx.beginPath();
     this.ctx.arc(x+this.offset[0], y+this.offset[1], 2, 0, 2 * Math.PI);
     this.ctx.fill();
+
+  }
+
+  fillTetragon(coord1, coord2, coord3, coord4, color){
+
+    this.ctx.beginPath();
+    this.ctx.moveTo(coord1[0] + this.offset[0], coord1[1] + this.offset[1]);
+    this.ctx.lineTo(coord2[0] + this.offset[0], coord2[1] + this.offset[1]);
+    this.ctx.lineTo(coord3[0] + this.offset[0], coord3[1] + this.offset[1]);
+    this.ctx.lineTo(coord4[0] + this.offset[0], coord4[1] + this.offset[1]);
+    this.ctx.closePath();
+    this.ctx.fillStyle = color;
+    this.ctx.fill();
+
+  }
+
+  drawLine(coord_1, coord_2){
+
+    this.ctx.beginPath();
+    this.ctx.moveTo(coord_1[2] + this.offset[0], coord_1[1] + this.offset[1]);
+    this.ctx.lineTo(coord_2[2] + this.offset[0], coord_2[1] + this.offset[1]);  //index 2 docasne
+    this.ctx.stroke();
 
   }
 
@@ -118,6 +141,8 @@ class ProjectionPlane{
       graphics.drawPoint(point_coord[2], point_coord[1]); //rovina yz
     }*/
 
+    var points = [];
+
     for(  let obj of cube.getRelativeVerticesCoordinates() ){
       var after_rot = cube.rotateY(obj[0], obj[2]);
       var final = cube.translate(after_rot[0], after_rot[1], [cube.x, cube.z]);
@@ -126,7 +151,17 @@ class ProjectionPlane{
       var point_coord = this.projectPoint(vert_coord, camera);
       graphics.drawPoint(point_coord[2], point_coord[1]); //rovina yz
 
+      points.push(point_coord);
+
     }
+
+    for(let i = 0; i < points.length; ++i){
+      for(let j = i+1; j < points.length; ++j){
+          graphics.drawLine(points[i], points[j]);
+      }
+    }
+
+    //vybarvovaci fce?
   }
 
 }
