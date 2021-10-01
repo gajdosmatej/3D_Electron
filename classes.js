@@ -31,6 +31,29 @@ class Cube{
       }}}
   }
 
+  *getRelativeVerticesCoordinates(){
+      for(let x_modifier of [-1, 1]){
+          for(let y_modifier of [-1, 1]){
+              for(let z_modifier of [-1, 1]){
+
+                yield [x_modifier * this.side_len / 2,
+                      y_modifier * this.side_len / 2,
+                      z_modifier * this.side_len / 2];
+      }}}
+  }
+
+  rotateY(x, z){
+    var x_new = x * Math.cos(this.phi) - z * Math.sin(this.phi);
+    var z_new = x * Math.sin(this.phi) + z* Math.cos(this.phi);
+    return [x_new, z_new];
+  }
+
+  translate(x, y, translate_vector){
+
+    return [x + translate_vector[0], y + translate_vector[1]];
+
+  }
+
 }
 
 
@@ -38,6 +61,7 @@ class GraphicsControl{
 
   canvas;
   ctx;
+  offset = [40, 40];
 
   constructor(canvas){
 
@@ -49,8 +73,16 @@ class GraphicsControl{
   drawSquare(x,y,side){
 
     this.ctx.beginPath();
-    this.ctx.rect(x, y, x+side, y+side);
+    this.ctx.rect(x+this.offset[0], y+this.offset[1], x+side+this.offset[0], y+side+this.offset[1]);
     this.ctx.stroke();
+
+  }
+
+  drawPoint(x,y){
+
+    this.ctx.beginPath();
+    this.ctx.arc(x+this.offset[0], y+this.offset[1], 2, 0, 2 * Math.PI);
+    this.ctx.fill();
 
   }
 
@@ -67,6 +99,34 @@ class ProjectionPlane{
     this.width = w;
     this.height = h;
 
+  }
+
+  projectPoint(coord, camera){
+
+    var direct_vector = [coord[0] - camera.x, coord[1] - camera.y, coord[2] - camera.z];
+    var line = t => [camera.x + t*direct_vector[0], camera.y + t*direct_vector[1], camera.z + t*direct_vector[2]];
+    var T = this.distance / (coord[0] - camera.x);  //jen pro kameru mířící ve směru x
+    var point_coord = line(T);
+    return point_coord;
+
+  }
+
+  projectCube(cube, camera, graphics){
+    /*for( let vert_coord of cube.getVerticesCoordinates() ){
+
+      var point_coord = this.projectPoint(vert_coord, camera);
+      graphics.drawPoint(point_coord[2], point_coord[1]); //rovina yz
+    }*/
+
+    for(  let obj of cube.getRelativeVerticesCoordinates() ){
+      var after_rot = cube.rotateY(obj[0], obj[2]);
+      var final = cube.translate(after_rot[0], after_rot[1], [cube.x, cube.z]);
+      var vert_coord = [final[0], obj[1] + cube.y, final[1]];
+
+      var point_coord = this.projectPoint(vert_coord, camera);
+      graphics.drawPoint(point_coord[2], point_coord[1]); //rovina yz
+
+    }
   }
 
 }

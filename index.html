@@ -12,10 +12,20 @@
     var camera = new Camera();
     var plane = new ProjectionPlane(window.innerWidth, window.innerHeight);
 
-    var cube = new Cube(50,40,50,20, Math.PI / 6);
-    for( obj of cube.getVerticesCoordinates() ){  console.log(obj);  }
+    var cube = new Cube(70,0,0,30, Math.PI / 4);
+  //  for( obj of cube.getVerticesCoordinates() ){  console.log(obj);  }
+/*
+    for(  obj of cube.getRelativeVerticesCoordinates() ){
+      after_rot = cube.rotateY(obj[0], obj[2]);
+      final = cube.translate(after_rot[0], after_rot[1], [cube.x, cube.z]);
+      console.log(final[0]);
+      console.log(obj[1] + cube.y);
+      console.log(final[1]);
 
-    graphics.drawSquare(cube.x,cube.y,cube.side_len);
+    }*/
+
+    plane.projectCube(cube, camera, graphics);
+    //graphics.drawSquare(cube.x,cube.y,cube.side_len);
 
   }
 
