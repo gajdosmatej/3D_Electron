@@ -3,6 +3,7 @@
 <meta charset="utf-8">
 
 <script src="classes.js"></script>
+<script src="math_classes.js"></script>
 <script language="javascript">
 
 
@@ -16,7 +17,7 @@
     var camera = new Camera();
     var plane = new ProjectionPlane(window.innerWidth, window.innerHeight);
 
-    var cube = new Cube(100,0,40,60, Math.PI / 3);
+    var cube = new Cube(80,0,50,60, Math.PI / 1);
   //  for( obj of cube.getVerticesCoordinates() ){  console.log(obj);  }
 /*
     for(  obj of cube.getRelativeVerticesCoordinates() ){
@@ -30,7 +31,10 @@
 
     plane.projectCube(cube, camera, graphics);
     //graphics.drawSquare(cube.x,cube.y,cube.side_len);
-
+    var u = new Vector(10,15,20);
+    var v = new Vector(5,15,-10);
+    //u.add(5);
+    //console.log(u);
   }
 
 </script>

@@ -2,6 +2,7 @@ class Cube{
   x;
   y;
   z;
+  position_vector;
   side_len;
   phi;
 
@@ -11,8 +12,10 @@ class Cube{
     this.z = z;
     this.side_len = len;
     this.phi = phi;
+    this.position_vector = new Vector(x,y,z);
   }
 
+/*
   *getVerticesCoordinates(){
       console.log(this.phi);
       for(let y_modifier of [-1, 1]){
@@ -29,6 +32,23 @@ class Cube{
 
                 yield position_vector;
       }}}
+  }*/
+
+  *getVerticesCoordinates(){
+
+      var cos_phi = Math.cos(this.phi);
+      var sin_phi = Math.sin(this.phi);
+
+      for(let centre_vertex_vector of this.getRelativeVerticesCoordinates()){;
+
+          var rot_Y_matrix = new Tensor(    [[cos_phi, 0, sin_phi],
+                                            [0, 1, 0],
+                                            [-sin_phi, 0, cos_phi]] );
+
+          var rot_centre_vertex_vector = rot_Y_matrix.multiply(centre_vertex_vector);
+          var vertex_vector = rot_centre_vertex_vector.add( new Vector(this.x, this.y, this.z) );
+          yield vertex_vector;
+    }
   }
 
   *getRelativeVerticesCoordinates(){
@@ -36,22 +56,10 @@ class Cube{
           for(let y_modifier of [-1, 1]){
               for(let z_modifier of [-1, 1]){
 
-                yield [x_modifier * this.side_len / 2,
+                yield new Vector(x_modifier * this.side_len / 2,
                       y_modifier * this.side_len / 2,
-                      z_modifier * this.side_len / 2];
+                      z_modifier * this.side_len / 2);
       }}}
-  }
-
-  rotateY(x, z){
-    var x_new = x * Math.cos(this.phi) - z * Math.sin(this.phi);
-    var z_new = x * Math.sin(this.phi) + z* Math.cos(this.phi);
-    return [x_new, z_new];
-  }
-
-  translate(x, y, translate_vector){
-
-    return [x + translate_vector[0], y + translate_vector[1]];
-
   }
 
 }
@@ -124,35 +132,25 @@ class ProjectionPlane{
 
   }
 
-  projectPoint(coord, camera){
+  projectPoint(point_vector, camera){
 
-    var direct_vector = [coord[0] - camera.x, coord[1] - camera.y, coord[2] - camera.z];
-    var line = t => [camera.x + t*direct_vector[0], camera.y + t*direct_vector[1], camera.z + t*direct_vector[2]];
-    var T = this.distance / (coord[0] - camera.x);  //jen pro kameru mířící ve směru x
-    var point_coord = line(T);
-    return point_coord;
+    var direction_vector = point_vector.add(new Vector( -camera.x, -camera.y, -camera.z) );
+    var line = t => [camera.x + t*direction_vector.x, camera.y + t*direction_vector.y, camera.z + t*direction_vector.z];
+    var T = this.distance / (point_vector.x - camera.x);  //jen pro kameru mířící ve směru x
+    var intersect_coord = line(T);
+    return intersect_coord;
 
   }
 
   projectCube(cube, camera, graphics){
-    /*for( let vert_coord of cube.getVerticesCoordinates() ){
-
-      var point_coord = this.projectPoint(vert_coord, camera);
-      graphics.drawPoint(point_coord[2], point_coord[1]); //rovina yz
-    }*/
 
     var points = [];
 
-    for(  let obj of cube.getRelativeVerticesCoordinates() ){
-      var after_rot = cube.rotateY(obj[0], obj[2]);
-      var final = cube.translate(after_rot[0], after_rot[1], [cube.x, cube.z]);
-      var vert_coord = [final[0], obj[1] + cube.y, final[1]];
+    for(  let vertex_vector of cube.getVerticesCoordinates() ){
 
-      var point_coord = this.projectPoint(vert_coord, camera);
-      graphics.drawPoint(point_coord[2], point_coord[1]); //rovina yz
-
-      points.push(point_coord);
-
+        var point_coord = this.projectPoint(vertex_vector, camera);
+        graphics.drawPoint(point_coord[2], point_coord[1]); //rovina yz
+        points.push(point_coord);
     }
 
     for(let i = 0; i < points.length; ++i){
