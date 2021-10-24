@@ -6,6 +6,10 @@
 <script src="math_classes.js"></script>
 <script language="javascript">
 
+  var camera;
+  var cube;
+  var graphics;
+  var plane;
 
   function load(){
 
@@ -13,11 +17,12 @@
     can.width = 0.96*window.innerWidth;
     can.height = 0.96*window.innerHeight;
 
-    var graphics = new GraphicsControl(can);
-    var camera = new Camera();
-    var plane = new ProjectionPlane(window.innerWidth, window.innerHeight);
+    graphics = new GraphicsControl(can);
+    camera = new Camera();
+    var distance = can.width / (2 * Math.tan(camera.field_of_view / 2));
+    plane = new ProjectionPlane(window.innerWidth, window.innerHeight, distance);
 
-    var cube = new Cube(80,0,50,60, Math.PI / 1);
+    cube = new Cube(100,0,0,60, Math.PI / 1);
   //  for( obj of cube.getVerticesCoordinates() ){  console.log(obj);  }
 /*
     for(  obj of cube.getRelativeVerticesCoordinates() ){
@@ -37,11 +42,20 @@
     //console.log(u);
   }
 
+  function redraw(){
+
+    graphics.clear();
+    plane.projectCube(cube, camera, graphics);
+    console.log(camera.phi);
+
+  }
+
 </script>
 
 </head>
 <body onload="load();">
-
+<input type="button" value="<-" onclick="camera.rotate(-0.03*Math.PI); redraw();">
+<input type="button" value="->" onclick="camera.rotate(0.03*Math.PI); redraw();">
 <canvas id="cnv" style="border: solid 1px;">
 
 </body>

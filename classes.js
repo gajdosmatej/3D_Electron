@@ -111,10 +111,15 @@ class GraphicsControl{
   drawLine(coord_1, coord_2){
 
     this.ctx.beginPath();
-    this.ctx.moveTo(coord_1[2] + this.offset[0], coord_1[1] + this.offset[1]);
-    this.ctx.lineTo(coord_2[2] + this.offset[0], coord_2[1] + this.offset[1]);  //index 2 docasne
+    this.ctx.moveTo(coord_1[0] + this.offset[0], coord_1[1] + this.offset[1]);
+    this.ctx.lineTo(coord_2[0] + this.offset[0], coord_2[1] + this.offset[1]);  //index 2 docasne
     this.ctx.stroke();
 
+  }
+
+  clear(){
+
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
 }
@@ -123,22 +128,47 @@ class ProjectionPlane{
 
   width;
   height;
-  distance = 100;
+  distance;
 
-  constructor(w,h){
+  constructor(w,h, d){
 
     this.width = w;
     this.height = h;
+    this.distance = d;
 
   }
 
   projectPoint(point_vector, camera){
 
-    var direction_vector = point_vector.add(new Vector( -camera.x, -camera.y, -camera.z) );
-    var line = t => [camera.x + t*direction_vector.x, camera.y + t*direction_vector.y, camera.z + t*direction_vector.z];
-    var T = this.distance / (point_vector.x - camera.x);  //jen pro kameru mířící ve směru x
-    var intersect_coord = line(T);
-    return intersect_coord;
+    if(camera.isInFieldOfView(point_vector)){
+
+      var direction_vector = point_vector.add(new Vector( -camera.x, -camera.y, -camera.z) );
+      var line = t =>
+      {return new Vector( camera.x + t*direction_vector.x,
+                          camera.y + t*direction_vector.y,
+                          camera.z + t*direction_vector.z);};
+
+      //var T = this.distance / (point_vector.x - camera.x);  //jen pro kameru mířící ve směru x
+      var T = (this.distance - camera.x * Math.cos(camera.phi) - camera.z * Math.cos(camera.phi)) /
+              (direction_vector.x * Math.cos(camera.phi) + direction_vector.z * Math.sin(camera.phi));
+      var intersect_vector = line(T);
+      console.log(intersect_vector);
+      return intersect_vector;
+    }
+  }
+
+  transformCoordinateSystem(point, camera){
+
+    //var new_coord = [point.z, point.y];
+    /*return [Math.sqrt(point.x * point.x + point.z * point.z - this.distance * this.distance),
+            point.y];*/
+    var sign = 1;
+    if(point.z - point.x * Math.tan(camera.phi) > 0){ sign = -1;  } //zamezeni ztraty nekterych bodu vlivem odmocniny
+    var new_coord = [sign * Math.sqrt( point.x ** 2 + point.z ** 2 + this.distance ** 2 -
+            2 * this.distance * (point.x * Math.cos(camera.phi) + point.z * Math.sin(camera.phi)) ),
+            point.y];
+    //console.log(new_coord);
+    return new_coord;
 
   }
 
@@ -148,9 +178,13 @@ class ProjectionPlane{
 
     for(  let vertex_vector of cube.getVerticesCoordinates() ){
 
-        var point_coord = this.projectPoint(vertex_vector, camera);
-        graphics.drawPoint(point_coord[2], point_coord[1]); //rovina yz
-        points.push(point_coord);
+        var intersect_point = this.projectPoint(vertex_vector, camera);
+        if(intersect_point == undefined){ continue; }
+        var intersect_point_plane = this.transformCoordinateSystem(intersect_point, camera);
+        graphics.drawPoint(intersect_point_plane[0], intersect_point[1]);
+        points.push(intersect_point_plane);
+        /*graphics.drawPoint(intersect_point.z, intersect_point.y);
+        points.push([intersect_point.z, intersect_point.y]);*/
     }
 
     for(let i = 0; i < points.length; ++i){
@@ -169,7 +203,8 @@ class Camera{
   x = 0;
   y = 0;
   z = 0;
-  phi = 0;
+  phi = 0*Math.PI;
+  field_of_view = 5*Math.PI/6;
 
   move(delta_x,delta_y,delta_z){
 
@@ -182,6 +217,28 @@ class Camera{
   rotate(delta_phi){
 
     this.phi += delta_phi;
+    while(this.phi >= 2 * Math.PI){ this.phi -= 2*Math.PI;  }
+    while(this.phi < 0){ this.phi += 2*Math.PI;  }
+
+  }
+
+  isInFieldOfView(point){
+/*
+    console.log(point);
+    var logic_1 = (point.z > point.x * Math.tan(this.phi - this.field_of_view / 2));
+    var logic_2 = (point.z < point.x * Math.tan(this.phi + this.field_of_view / 2));
+    var logic_3 =
+
+    return (logic_1 && logic_2);*/
+
+    var diff = this.phi - this.field_of_view / 2;
+    var add = this.phi + this.field_of_view / 2;
+
+    var psi = Math.atan(point.z / point.x);
+    var logic_1 = Math.tan(0.5*psi) > Math.tan(0.5*diff); //tg(x/2) je rostouci fce periodicka na 2pi, zjednodusí porovnavani uhlu
+    var logic_2 = Math.tan(0.5*psi) < Math.tan(0.5*add);
+
+    return (logic_1 && logic_2);
 
   }
 }

@@ -75,3 +75,20 @@ class Tensor{
     }
 
 }
+
+/*class Angle{
+  value;
+
+  constructor(angle){
+
+    this.value = angle;
+
+  }
+
+  IsLessThan(angle2){
+
+    return this.value < angle2.value
+
+  }
+
+}*/
