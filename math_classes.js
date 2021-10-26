@@ -27,6 +27,14 @@ class Vector{
             return this;
         }
     }
+
+    getNorm(){
+        return Math.sqrt(this.x **2 + this.y **2 + this.z **2);
+    }
+
+    multiply(scalar){
+        return new Vector(this.x * scalar, this.y * scalar, this.z * scalar);
+    }
 }
 
 class Tensor{

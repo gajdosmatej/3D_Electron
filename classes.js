@@ -129,6 +129,7 @@ class ProjectionPlane{
   width;
   height;
   distance;
+  r = 200;
 
   constructor(w,h, d){
 
@@ -152,9 +153,26 @@ class ProjectionPlane{
       var T = (this.distance - camera.x * Math.cos(camera.phi) - camera.z * Math.cos(camera.phi)) /
               (direction_vector.x * Math.cos(camera.phi) + direction_vector.z * Math.sin(camera.phi));
       var intersect_vector = line(T);
-      console.log(intersect_vector);
+      //console.log(intersect_vector);
       return intersect_vector;
     }
+  }
+
+  projectPointOnSphere(point_vector, camera){
+
+      return point_vector.multiply(this.r / point_vector.getNorm());
+
+  }
+
+  transformCoordinateSystemSphere(point, camera){
+
+      var cos_theta = (point.x * Math.cos(camera.phi) + point.z * Math.sin(camera.phi)) / Math.sqrt(point.x **2 + point.z **2);
+      //var cos_theta = (point.x * Math.cos(camera.phi) + point.z * Math.sin(camera.phi)) / point.getNorm();
+      var sgn = 1;
+      //if(point.x > this.r * Math.cos(camera.phi)){ sgn = -1;   }
+      var new_x = sgn * this.r * Math.acos(cos_theta);
+      console.log(cos_theta);
+      return [new_x, point.y];
   }
 
   transformCoordinateSystem(point, camera){
@@ -177,14 +195,18 @@ class ProjectionPlane{
     var points = [];
 
     for(  let vertex_vector of cube.getVerticesCoordinates() ){
-
+/*
         var intersect_point = this.projectPoint(vertex_vector, camera);
         if(intersect_point == undefined){ continue; }
         var intersect_point_plane = this.transformCoordinateSystem(intersect_point, camera);
-        graphics.drawPoint(intersect_point_plane[0], intersect_point[1]);
+        graphics.drawPoint(intersect_point_plane[0], intersect_point_plane[1]);
         points.push(intersect_point_plane);
-        /*graphics.drawPoint(intersect_point.z, intersect_point.y);
-        points.push([intersect_point.z, intersect_point.y]);*/
+        */
+
+        var intersect_point = this.projectPointOnSphere(vertex_vector, camera);
+        var intersect_point_sphere = this.transformCoordinateSystemSphere(intersect_point, camera);
+        graphics.drawPoint(intersect_point_sphere[0], intersect_point_sphere[1]);
+        points.push(intersect_point_sphere);
     }
 
     for(let i = 0; i < points.length; ++i){
