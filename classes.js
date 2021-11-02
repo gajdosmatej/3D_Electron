@@ -129,13 +129,14 @@ class ProjectionPlane{
   width;
   height;
   distance;
-  r = 200;
+  r = 100;
 
-  constructor(w,h, d){
+  constructor(w,h, d,r){
 
     this.width = w;
     this.height = h;
     this.distance = d;
+    this.r = r;
 
   }
 
@@ -160,19 +161,28 @@ class ProjectionPlane{
 
   projectPointOnSphere(point_vector, camera){
 
+    //if(camera.isInFieldOfView(point_vector)){
       return point_vector.multiply(this.r / point_vector.getNorm());
-
+    //}
   }
 
   transformCoordinateSystemSphere(point, camera){
 
       var cos_theta = (point.x * Math.cos(camera.phi) + point.z * Math.sin(camera.phi)) / Math.sqrt(point.x **2 + point.z **2);
-      //var cos_theta = (point.x * Math.cos(camera.phi) + point.z * Math.sin(camera.phi)) / point.getNorm();
       var sgn = 1;
-      //if(point.x > this.r * Math.cos(camera.phi)){ sgn = -1;   }
+      var cos_phi = Math.cos(camera.phi);
+      var sin_phi = Math.sin(camera.phi);
+      var rot_Y_matrix = new Tensor(    [[cos_phi, 0, sin_phi],
+                                            [0, 1, 0],
+                                            [-sin_phi, 0, cos_phi]] );
+
+      var new_point = rot_Y_matrix.multiply(point);
+      if(new_point.z < 0){  sgn = -1;   }
       var new_x = sgn * this.r * Math.acos(cos_theta);
-      console.log(cos_theta);
+      console.log(camera.phi / Math.PI * 180);
+      //console.log(new_x);
       return [new_x, point.y];
+
   }
 
   transformCoordinateSystem(point, camera){
@@ -194,30 +204,32 @@ class ProjectionPlane{
 
     var points = [];
 
-    for(  let vertex_vector of cube.getVerticesCoordinates() ){
-/*
-        var intersect_point = this.projectPoint(vertex_vector, camera);
-        if(intersect_point == undefined){ continue; }
-        var intersect_point_plane = this.transformCoordinateSystem(intersect_point, camera);
-        graphics.drawPoint(intersect_point_plane[0], intersect_point_plane[1]);
-        points.push(intersect_point_plane);
-        */
+    if(camera.isCubeInFieldOfView(cube)){
 
-        var intersect_point = this.projectPointOnSphere(vertex_vector, camera);
-        var intersect_point_sphere = this.transformCoordinateSystemSphere(intersect_point, camera);
-        graphics.drawPoint(intersect_point_sphere[0], intersect_point_sphere[1]);
-        points.push(intersect_point_sphere);
-    }
+        for(  let vertex_vector of cube.getVerticesCoordinates() ){
+    /*
+            var intersect_point = this.projectPoint(vertex_vector, camera);
+            if(intersect_point == undefined){ continue; }
+            var intersect_point_plane = this.transformCoordinateSystem(intersect_point, camera);
+            graphics.drawPoint(intersect_point_plane[0], intersect_point_plane[1]);
+            points.push(intersect_point_plane);
+            */
 
-    for(let i = 0; i < points.length; ++i){
-      for(let j = i+1; j < points.length; ++j){
-          graphics.drawLine(points[i], points[j]);
-      }
-    }
+            var intersect_point = this.projectPointOnSphere(vertex_vector, camera);
+            var intersect_point_sphere = this.transformCoordinateSystemSphere(intersect_point, camera);
+            graphics.drawPoint(intersect_point_sphere[0], intersect_point_sphere[1]);
+            points.push(intersect_point_sphere);
+        }
+
+        for(let i = 0; i < points.length; ++i){
+          for(let j = i+1; j < points.length; ++j){
+              graphics.drawLine(points[i], points[j]);
+          }
+        }
 
     //vybarvovaci fce?
-  }
-
+    }
+}
 }
 
 class Camera{
@@ -262,5 +274,13 @@ class Camera{
 
     return (logic_1 && logic_2);
 
+  }
+
+  isCubeInFieldOfView(cube){
+
+      for(  let vertex_vector of cube.getVerticesCoordinates() ){
+          if(this.isInFieldOfView(vertex_vector)){  return true;    }
+      }
+      return false;
   }
 }

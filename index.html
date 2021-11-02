@@ -20,9 +20,10 @@
     graphics = new GraphicsControl(can);
     camera = new Camera();
     var distance = can.width / (2 * Math.tan(camera.field_of_view / 2));
-    plane = new ProjectionPlane(window.innerWidth, window.innerHeight, distance);
+    var r = can.width / camera.field_of_view;
+    plane = new ProjectionPlane(window.innerWidth, window.innerHeight, distance, r);
 
-    cube = new Cube(100,0,40,60, Math.PI / 1);
+    cube = new Cube(150,0,40,60, Math.PI / 1);
   //  for( obj of cube.getVerticesCoordinates() ){  console.log(obj);  }
 /*
     for(  obj of cube.getRelativeVerticesCoordinates() ){
