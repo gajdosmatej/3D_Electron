@@ -23,7 +23,7 @@
     var r = can.width / camera.field_of_view;
     plane = new ProjectionPlane(window.innerWidth, window.innerHeight, distance, r);
 
-    cube = new Cube(150,0,40,60, Math.PI / 1);
+    cube = new Cube(150,0,30,60, Math.PI / 1);
   //  for( obj of cube.getVerticesCoordinates() ){  console.log(obj);  }
 /*
     for(  obj of cube.getRelativeVerticesCoordinates() ){
@@ -47,6 +47,7 @@
 
     graphics.clear();
     plane.projectCube(cube, camera, graphics);
+    //console.log(camera.x);
     //console.log(camera.phi);
 
   }
@@ -57,6 +58,10 @@
 <body onload="load();">
 <input type="button" value="<-" onclick="camera.rotate(-0.03*Math.PI); redraw();">
 <input type="button" value="->" onclick="camera.rotate(0.03*Math.PI); redraw();">
+<input type="button" value="^" onclick="camera.move(0,0,5); redraw();">
+<input type="button" value="<" onclick="camera.move(-5,0,0); redraw();">
+<input type="button" value=">" onclick="camera.move(5,0,0); redraw();">
+<input type="button" value="v" onclick="camera.move(0,0,-5); redraw();">
 <canvas id="cnv" style="border: solid 1px;">
 
 </body>

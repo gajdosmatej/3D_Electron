@@ -62,6 +62,15 @@ class Cube{
       }}}
   }
 
+getSidesFromVertex(vertex_index){
+
+    var sides = [[0,1,2,3], [4,5,6,7], [0,1,4,5], [2,3,6,7], [0,2,4,6], [1,3,5,7]];
+    var selected_sides = [];
+    for(let i = 0; i < sides.length; ++i){
+        if(sides[i].includes(vertex_index)){    sides.append(sides[i]); }
+    }
+    return selected_sides;
+}
 }
 
 
@@ -179,7 +188,7 @@ class ProjectionPlane{
       var new_point = rot_Y_matrix.multiply(point);
       if(new_point.z < 0){  sgn = -1;   }
       var new_x = sgn * this.r * Math.acos(cos_theta);
-      console.log(camera.phi / Math.PI * 180);
+      //console.log(camera.phi / Math.PI * 180);
       //console.log(new_x);
       return [new_x, point.y];
 
@@ -203,7 +212,6 @@ class ProjectionPlane{
   projectCube(cube, camera, graphics){
 
     var points = [];
-
     if(camera.isCubeInFieldOfView(cube)){
 
         for(  let vertex_vector of cube.getVerticesCoordinates() ){
