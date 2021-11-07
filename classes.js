@@ -67,7 +67,7 @@ getSidesFromVertex(vertex_index){
     var sides = [[0,1,2,3], [4,5,6,7], [0,1,4,5], [2,3,6,7], [0,2,4,6], [1,3,5,7]];
     var selected_sides = [];
     for(let i = 0; i < sides.length; ++i){
-        if(sides[i].includes(vertex_index)){    sides.append(sides[i]); }
+        if(sides[i].includes(vertex_index)){    selected_sides.push(sides[i]); }
     }
     return selected_sides;
 }
@@ -131,6 +131,29 @@ class GraphicsControl{
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
+  rearangeTetragonCoords(coords){
+    var dist_quad = (coord1, coord2) => (coord1[0] - coord2[0])**2 + (coord1[1] - coord2[1])**2;
+    var new_coords = [coords[0]];
+    var remain_coords = [];
+
+    if(dist_quad(new_coords[0], coords[1]) < dist_quad(new_coords[0], coords[2])){
+      new_coords.push(coords[1]);
+      remain_coords = [coords[2], coords[3]];
+    }
+    else{
+      new_coords.push(coords[2]);
+      remain_coords = [coords[1], coords[3]];
+    }
+
+    if(dist_quad(new_coords[1], remain_coords[0]) < dist_quad(new_coords[1], remain_coords[1])){
+      new_coords.push(remain_coords[0], remain_coords[1]);
+      return new_coords;
+    }
+    else{
+      new_coords.push(remain_coords[1], remain_coords[0]);
+      return new_coords;
+    }
+  }
 }
 
 class ProjectionPlane{
@@ -214,8 +237,17 @@ class ProjectionPlane{
     var points = [];
     if(camera.isCubeInFieldOfView(cube)){
 
+        var nearest_index = null;
+        var nearest_distance = null;
         for(  let vertex_vector of cube.getVerticesCoordinates() ){
-    /*
+
+            if(nearest_distance == null || nearest_distance > vertex_vector.getNorm()){
+
+              nearest_index = points.length;
+              nearest_distance = vertex_vector.getNorm();
+
+            }
+            /*
             var intersect_point = this.projectPoint(vertex_vector, camera);
             if(intersect_point == undefined){ continue; }
             var intersect_point_plane = this.transformCoordinateSystem(intersect_point, camera);
@@ -228,15 +260,32 @@ class ProjectionPlane{
             graphics.drawPoint(intersect_point_sphere[0], intersect_point_sphere[1]);
             points.push(intersect_point_sphere);
         }
-
+        console.log(nearest_index);
         for(let i = 0; i < points.length; ++i){
           for(let j = i+1; j < points.length; ++j){
               graphics.drawLine(points[i], points[j]);
           }
         }
 
+        this.colorCubeFromSides(graphics, points, cube.getSidesFromVertex(nearest_index));
     //vybarvovaci fce?
     }
+}
+
+colorCubeFromSides(graphics, points, sides_indices){
+  var col_index = 0;
+  var colors = ["#FF0000", "#00FF00", "#0000FF"];
+  for(var side_indices of sides_indices){
+
+    var tetragon_points = [];
+    for(let i=0; i<4; ++i){ tetragon_points.push(points[side_indices[i]]); }
+
+    tetragon_points = graphics.rearangeTetragonCoords(tetragon_points);
+
+    graphics.fillTetragon(tetragon_points[0], tetragon_points[1], tetragon_points[2], tetragon_points[3], colors[col_index]);
+    console.log(colors[col_index]);
+    col_index += 1;
+  }
 }
 }
 

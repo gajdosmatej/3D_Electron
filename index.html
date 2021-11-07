@@ -23,24 +23,10 @@
     var r = can.width / camera.field_of_view;
     plane = new ProjectionPlane(window.innerWidth, window.innerHeight, distance, r);
 
-    cube = new Cube(150,0,30,60, Math.PI / 1);
-  //  for( obj of cube.getVerticesCoordinates() ){  console.log(obj);  }
-/*
-    for(  obj of cube.getRelativeVerticesCoordinates() ){
-      after_rot = cube.rotateY(obj[0], obj[2]);
-      final = cube.translate(after_rot[0], after_rot[1], [cube.x, cube.z]);
-      console.log(final[0]);
-      console.log(obj[1] + cube.y);
-      console.log(final[1]);
-
-    }*/
+    cube = new Cube(150,0,40,60, Math.PI / 12);
 
     plane.projectCube(cube, camera, graphics);
-    //graphics.drawSquare(cube.x,cube.y,cube.side_len);
-    var u = new Vector(10,15,20);
-    var v = new Vector(5,15,-10);
-    //u.add(5);
-    //console.log(u);
+
   }
 
   function redraw(){
