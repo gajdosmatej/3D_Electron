@@ -318,14 +318,7 @@ move(delta_x,delta_y,delta_z){
   }
 
   isInFieldOfView(point){
-/*
-    console.log(point);
-    var logic_1 = (point.z > point.x * Math.tan(this.phi - this.field_of_view / 2));
-    var logic_2 = (point.z < point.x * Math.tan(this.phi + this.field_of_view / 2));
-    var logic_3 =
-
-    return (logic_1 && logic_2);*/
-    point.add(new Vector(-camera.x, -camera.y, -camera.z));
+    /*point.add(new Vector(-camera.x, -camera.y, -camera.z));
     var diff = this.phi - this.field_of_view / 2;
     var add = this.phi + this.field_of_view / 2;
 
@@ -334,8 +327,20 @@ move(delta_x,delta_y,delta_z){
     var logic_1 = tg > Math.tan(0.5*diff); //tg(x/2) je rostouci fce periodicka na 2pi, zjednodusí porovnavani uhlu
     var logic_2 = tg < Math.tan(0.5*add);
 
-    return (logic_1 && logic_2);
+    return (logic_1 && logic_2);*/
 
+    point.add(new Vector(-camera.x, -camera.y, -camera.z));
+    var cos_phi = Math.cos(-camera.phi);
+    var sin_phi = Math.sin(-camera.phi);
+    var rot_Y_matrix = new Tensor(    [[cos_phi, 0, sin_phi],
+                                          [0, 1, 0],
+                                          [-sin_phi, 0, cos_phi]] );
+    point = rot_Y_matrix.multiply(point);
+
+    Debug({},{},{rotated_point_x : point.x, rotated_point_z: point.z});
+    var logic_1 = point.z < point.x * Math.tan(this.field_of_view / 2);
+    var logic_2 = point.z > - point.x * Math.tan(this.field_of_view / 2);
+    return (logic_1 && logic_2);    //stale dela problemy, ale o neco mensi
   }
 
   isCubeInFieldOfView(cube){
