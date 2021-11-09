@@ -193,6 +193,7 @@ class ProjectionPlane{
 
   projectPointOnSphere(point_vector, camera){
 
+      point_vector.add(new Vector(-camera.x, -camera.y, -camera.z)); //transformace do souradnic s pocatkem v kamere
     //if(camera.isInFieldOfView(point_vector)){
       return point_vector.multiply(this.r / point_vector.getNorm());
     //}
@@ -234,7 +235,10 @@ class ProjectionPlane{
 
   projectCube(cube, camera, graphics){
 
+    Debug([{phi: camera.phi}]);
+
     var points = [];
+    Debug([{},{isInFieldOfView: camera.isCubeInFieldOfView(cube)}]);
     if(camera.isCubeInFieldOfView(cube)){
 
         var nearest_index = null;
@@ -260,13 +264,14 @@ class ProjectionPlane{
             graphics.drawPoint(intersect_point_sphere[0], intersect_point_sphere[1]);
             points.push(intersect_point_sphere);
         }
-        console.log(nearest_index);
+
         for(let i = 0; i < points.length; ++i){
           for(let j = i+1; j < points.length; ++j){
               graphics.drawLine(points[i], points[j]);
           }
         }
 
+        for(let point of points){   Debug([{},{},{point: point}]); }
         this.colorCubeFromSides(graphics, points, cube.getSidesFromVertex(nearest_index));
     //vybarvovaci fce?
     }
@@ -283,7 +288,7 @@ colorCubeFromSides(graphics, points, sides_indices){
     tetragon_points = graphics.rearangeTetragonCoords(tetragon_points);
 
     graphics.fillTetragon(tetragon_points[0], tetragon_points[1], tetragon_points[2], tetragon_points[3], colors[col_index]);
-    console.log(colors[col_index]);
+    //console.log(colors[col_index]);
     col_index += 1;
   }
 }
@@ -297,13 +302,12 @@ class Camera{
   phi = 0*Math.PI;
   field_of_view = 5*Math.PI/6;
 
-  move(delta_x,delta_y,delta_z){
+move(delta_x,delta_y,delta_z){
+    this.x += delta_x;
+    this.y += delta_y;
+    this.z += delta_z;
 
-      this.x += delta_x;
-      this.y += delta_y;
-      this.z += delta_z;
-
-  }
+}
 
   rotate(delta_phi){
 
@@ -321,13 +325,14 @@ class Camera{
     var logic_3 =
 
     return (logic_1 && logic_2);*/
-
+    point.add(new Vector(-camera.x, -camera.y, -camera.z));
     var diff = this.phi - this.field_of_view / 2;
     var add = this.phi + this.field_of_view / 2;
 
-    var psi = Math.atan(point.z / point.x);
-    var logic_1 = Math.tan(0.5*psi) > Math.tan(0.5*diff); //tg(x/2) je rostouci fce periodicka na 2pi, zjednodusí porovnavani uhlu
-    var logic_2 = Math.tan(0.5*psi) < Math.tan(0.5*add);
+    var tg = point.z / (2*point.x);
+        Debug([{}, {x: point.x, z: point.z, ratio: tg, low: Math.tan(0.5*diff), high: Math.tan(0.5*add)}]);
+    var logic_1 = tg > Math.tan(0.5*diff); //tg(x/2) je rostouci fce periodicka na 2pi, zjednodusí porovnavani uhlu
+    var logic_2 = tg < Math.tan(0.5*add);
 
     return (logic_1 && logic_2);
 
@@ -340,4 +345,15 @@ class Camera{
       }
       return false;
   }
+}
+
+function Debug(info){
+    var DEBUG_LAYER = 1;    //-1 ... zadny debug, 0 ... zakladni debug, 1 ... rozsireny debug
+    var names = ["BASIC", "DETAILED", "EXTRA_DETAILED"]
+    for(let i = 0; i <= DEBUG_LAYER; ++i){
+        var dict = info[i];
+        for(property in dict){
+            console.log(names[i] + " | " + property + ": " + dict[property]);
+        }
+    }
 }
