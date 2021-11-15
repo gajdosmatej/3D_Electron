@@ -236,33 +236,34 @@ class ProjectionPlane{
   projectCube(cube, camera, graphics){
 
     Debug([{phi: camera.phi}]);
+    Debug([{},{isInFieldOfView: camera.isCubeInFieldOfView(cube)}]);
 
     var points = [];
-    Debug([{},{isInFieldOfView: camera.isCubeInFieldOfView(cube)}]);
     if(camera.isCubeInFieldOfView(cube)){
 
         var nearest_index = null;
         var nearest_distance = null;
         for(  let vertex_vector of cube.getVerticesCoordinates() ){
-
-            if(nearest_distance == null || nearest_distance > vertex_vector.getNorm()){
+            var displacement =
+              (vertex_vector.x - camera.x)**2 + (vertex_vector.y - camera.y)**2 + (vertex_vector.z - camera.z)**2;
+            if(nearest_distance == null || nearest_distance > displacement){
 
               nearest_index = points.length;
-              nearest_distance = vertex_vector.getNorm();
+              nearest_distance = displacement;
 
             }
-            /*
+
             var intersect_point = this.projectPoint(vertex_vector, camera);
             if(intersect_point == undefined){ continue; }
             var intersect_point_plane = this.transformCoordinateSystem(intersect_point, camera);
             graphics.drawPoint(intersect_point_plane[0], intersect_point_plane[1]);
             points.push(intersect_point_plane);
-            */
 
+            /*
             var intersect_point = this.projectPointOnSphere(vertex_vector, camera);
             var intersect_point_sphere = this.transformCoordinateSystemSphere(intersect_point, camera);
             graphics.drawPoint(intersect_point_sphere[0], intersect_point_sphere[1]);
-            points.push(intersect_point_sphere);
+            points.push(intersect_point_sphere);*/
         }
 
         for(let i = 0; i < points.length; ++i){
@@ -300,7 +301,7 @@ class Camera{
   y = 0;
   z = 0;
   phi = 0*Math.PI;
-  field_of_view = 5*Math.PI/6;
+  field_of_view = 0.8*Math.PI/6;
 
 move(delta_x,delta_y,delta_z){
     this.x += delta_x;
