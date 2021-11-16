@@ -6,7 +6,7 @@ class Cube{
   side_len;
   phi;
 
-  constructor(x, y, z, len, phi=0) {
+constructor(x, y, z, len, phi=0) {
     this.x = x;
     this.y = y;
     this.z = z;
@@ -34,7 +34,7 @@ class Cube{
       }}}
   }*/
 
-  *getVerticesCoordinates(){
+*getVerticesCoordinates(){
 
       var cos_phi = Math.cos(this.phi);
       var sin_phi = Math.sin(this.phi);
@@ -51,7 +51,7 @@ class Cube{
     }
   }
 
-  *getRelativeVerticesCoordinates(){
+*getRelativeVerticesCoordinates(){
       for(let x_modifier of [-1, 1]){
           for(let y_modifier of [-1, 1]){
               for(let z_modifier of [-1, 1]){
@@ -80,7 +80,7 @@ class GraphicsControl{
   ctx;
   offset;
 
-  constructor(canvas){
+constructor(canvas){
 
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
@@ -88,7 +88,7 @@ class GraphicsControl{
 
   }
 
-  drawSquare(x,y,side){
+drawSquare(x,y,side){
 
     this.ctx.beginPath();
     this.ctx.rect(x+this.offset[0], y+this.offset[1], x+side+this.offset[0], y+side+this.offset[1]);
@@ -96,7 +96,7 @@ class GraphicsControl{
 
   }
 
-  drawPoint(x,y){
+drawPoint(x,y){
 
     this.ctx.beginPath();
     this.ctx.arc(x+this.offset[0], y+this.offset[1], 2, 0, 2 * Math.PI);
@@ -104,7 +104,7 @@ class GraphicsControl{
 
   }
 
-  fillTetragon(coord1, coord2, coord3, coord4, color){
+fillTetragon(coord1, coord2, coord3, coord4, color){
 
     this.ctx.beginPath();
     this.ctx.moveTo(coord1[0] + this.offset[0], coord1[1] + this.offset[1]);
@@ -117,7 +117,7 @@ class GraphicsControl{
 
   }
 
-  drawLine(coord_1, coord_2){
+drawLine(coord_1, coord_2){
 
     this.ctx.beginPath();
     this.ctx.moveTo(coord_1[0] + this.offset[0], coord_1[1] + this.offset[1]);
@@ -126,12 +126,12 @@ class GraphicsControl{
 
   }
 
-  clear(){
+clear(){
 
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
-  rearangeTetragonCoords(coords){
+rearangeTetragonCoords(coords){
     var dist_quad = (coord1, coord2) => (coord1[0] - coord2[0])**2 + (coord1[1] - coord2[1])**2;
     var new_coords = [coords[0]];
     var remain_coords = [];
@@ -163,7 +163,7 @@ class ProjectionPlane{
   distance;
   r = 100;
 
-  constructor(w,h, d,r){
+constructor(w,h, d,r){
 
     this.width = w;
     this.height = h;
@@ -172,10 +172,10 @@ class ProjectionPlane{
 
   }
 
-  projectPoint(point_vector, camera){
+projectPoint(point_vector, camera){
 
     if(camera.isInFieldOfView(point_vector)){
-
+/*
       var direction_vector = point_vector.add(new Vector( -camera.x, -camera.y, -camera.z) );
       var line = t =>
       {return new Vector( camera.x + t*direction_vector.x,
@@ -187,11 +187,14 @@ class ProjectionPlane{
               (direction_vector.x * Math.cos(camera.phi) + direction_vector.z * Math.sin(camera.phi));
       var intersect_vector = line(T);
       //console.log(intersect_vector);
-      return intersect_vector;
+      return intersect_vector;*/
+
+      var k = this.distance / (point_vector.x * Math.cos(camera.phi) + point_vector.z * Math.sin(camera.phi));
+      return point_vector.multiply(k);
     }
   }
 
-  projectPointOnSphere(point_vector, camera){
+projectPointOnSphere(point_vector, camera){
 
       point_vector.add(new Vector(-camera.x, -camera.y, -camera.z)); //transformace do souradnic s pocatkem v kamere
     //if(camera.isInFieldOfView(point_vector)){
@@ -199,7 +202,7 @@ class ProjectionPlane{
     //}
   }
 
-  transformCoordinateSystemSphere(point, camera){
+transformCoordinateSystemSphere(point, camera){
 
       var cos_theta = (point.x * Math.cos(camera.phi) + point.z * Math.sin(camera.phi)) / Math.sqrt(point.x **2 + point.z **2);
       var sgn = 1;
@@ -218,22 +221,31 @@ class ProjectionPlane{
 
   }
 
-  transformCoordinateSystem(point, camera){
+transformCoordinateSystem(point, camera){
 
     //var new_coord = [point.z, point.y];
     /*return [Math.sqrt(point.x * point.x + point.z * point.z - this.distance * this.distance),
             point.y];*/
-    var sign = 1;
+/*    var sign = 1;
     if(point.z - point.x * Math.tan(camera.phi) > 0){ sign = -1;  } //zamezeni ztraty nekterych bodu vlivem odmocniny
     var new_coord = [sign * Math.sqrt( point.x ** 2 + point.z ** 2 + this.distance ** 2 -
             2 * this.distance * (point.x * Math.cos(camera.phi) + point.z * Math.sin(camera.phi)) ),
             point.y];
     //console.log(new_coord);
-    return new_coord;
+    return new_coord;*/
+    var cos = Math.cos(camera.phi);
+    var sin = Math.sin(camera.phi);
+    var translation = new Vector(-this.distance*cos, 0, -this.distance*sin);
+    var rotation_matrix = new Tensor(   [[sin, 0, cos],
+                                        [0, 1, 0],
+                                        [-cos, 0, sin]]);
+
+    var transformed_point = rotation_matrix.multiply(point.add(translation));
+    return [transformed_point.x, transformed_point.y];
 
   }
 
-  projectCube(cube, camera, graphics){
+projectCube(cube, camera, graphics){
 
     Debug([{phi: camera.phi}]);
     Debug([{},{isInFieldOfView: camera.isCubeInFieldOfView(cube)}]);
@@ -297,11 +309,11 @@ colorCubeFromSides(graphics, points, sides_indices){
 
 class Camera{
 
-  x = 0;
-  y = 0;
-  z = 0;
-  phi = 0*Math.PI;
-  field_of_view = 0.8*Math.PI/6;
+x = 0;
+y = 0;
+z = 0;
+phi = 0*Math.PI;
+field_of_view = 0.8*Math.PI/6;
 
 move(delta_x,delta_y,delta_z){
     this.x += delta_x;
@@ -310,7 +322,7 @@ move(delta_x,delta_y,delta_z){
 
 }
 
-  rotate(delta_phi){
+rotate(delta_phi){
 
     this.phi += delta_phi;
     while(this.phi >= 2 * Math.PI){ this.phi -= 2*Math.PI;  }
@@ -318,7 +330,7 @@ move(delta_x,delta_y,delta_z){
 
   }
 
-  isInFieldOfView(point){
+isInFieldOfView(point){
     /*point.add(new Vector(-camera.x, -camera.y, -camera.z));
     var diff = this.phi - this.field_of_view / 2;
     var add = this.phi + this.field_of_view / 2;
@@ -344,7 +356,7 @@ move(delta_x,delta_y,delta_z){
     return (logic_1 && logic_2);    //stale dela problemy, ale o neco mensi
   }
 
-  isCubeInFieldOfView(cube){
+isCubeInFieldOfView(cube){
 
       for(  let vertex_vector of cube.getVerticesCoordinates() ){
           if(this.isInFieldOfView(vertex_vector)){  return true;    }
