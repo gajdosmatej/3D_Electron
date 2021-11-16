@@ -11,6 +11,7 @@ class Vector{
 
     }
 
+
     add(v){
         try{
             if(v.constructor != Vector){    throw "Can only add vector to vector"}
@@ -34,6 +35,15 @@ class Vector{
 
     multiply(scalar){
         return new Vector(this.x * scalar, this.y * scalar, this.z * scalar);
+    }
+
+    getAngleXZ(){
+
+        if(this.x >= 0 && this.z >= 0){    return Math.atan(this.z / this.x);  }
+        else if(this.x < 0 && this.z >= 0){   return (Math.PI + Math.atan(this.z / this.x));   }
+        else if(this.x < 0 && this.z < 0){   return(Math.PI + Math.atan(this.z / this.x)); }
+        else if(this.x >= 0 && this.z < 0){   return (2*Math.PI + Math.atan(this.z / this.x));    }
+
     }
 }
 

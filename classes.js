@@ -248,7 +248,7 @@ transformCoordinateSystem(point, camera){
 projectCube(cube, camera, graphics){
 
     Debug([{phi: camera.phi}]);
-    Debug([{},{isInFieldOfView: camera.isCubeInFieldOfView(cube)}]);
+    Debug([{},{isCubeInFieldOfView: camera.isCubeInFieldOfView(cube)}]);
 
     var points = [];
     if(camera.isCubeInFieldOfView(cube)){
@@ -331,17 +331,8 @@ rotate(delta_phi){
   }
 
 isInFieldOfView(point){
-    /*point.add(new Vector(-camera.x, -camera.y, -camera.z));
-    var diff = this.phi - this.field_of_view / 2;
-    var add = this.phi + this.field_of_view / 2;
 
-    var tg = point.z / (2*point.x);
-        Debug([{}, {x: point.x, z: point.z, ratio: tg, low: Math.tan(0.5*diff), high: Math.tan(0.5*add)}]);
-    var logic_1 = tg > Math.tan(0.5*diff); //tg(x/2) je rostouci fce periodicka na 2pi, zjednodusí porovnavani uhlu
-    var logic_2 = tg < Math.tan(0.5*add);
-
-    return (logic_1 && logic_2);*/
-
+    //Debug([{angle: point.getAngleXZ() / Math.PI *180}]);
     point.add(new Vector(-camera.x, -camera.y, -camera.z));
     var cos_phi = Math.cos(-camera.phi);
     var sin_phi = Math.sin(-camera.phi);
@@ -350,15 +341,22 @@ isInFieldOfView(point){
                                           [-sin_phi, 0, cos_phi]] );
     point = rot_Y_matrix.multiply(point);
 
-    Debug({},{},{rotated_point_x : point.x, rotated_point_z: point.z});
+    var theta = point.getAngleXZ();
+    /*Debug({},{},{rotated_point_x : point.x, rotated_point_z: point.z});
     var logic_1 = point.z < point.x * Math.tan(this.field_of_view / 2);
     var logic_2 = point.z > - point.x * Math.tan(this.field_of_view / 2);
-    return (logic_1 && logic_2);    //stale dela problemy, ale o neco mensi
+    return (logic_1 && logic_2);    //stale dela problemy, ale o neco mensi*/
+    //Debug([{theta: theta, FOV: this.field_of_view, tan: Math.tan(0.5*theta)}]);
+    var logic_1 = Math.tan(0.5*theta) > Math.tan(-0.5*this.field_of_view/2);
+    var logic_2 = Math.tan(0.5*theta) < Math.tan(0.5*this.field_of_view/2);
+    return logic_1 && logic_2;
+
   }
 
 isCubeInFieldOfView(cube){
 
       for(  let vertex_vector of cube.getVerticesCoordinates() ){
+          Debug([{isPointInFOV: this.isInFieldOfView(vertex_vector)}]);
           if(this.isInFieldOfView(vertex_vector)){  return true;    }
       }
       return false;
