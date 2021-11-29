@@ -188,15 +188,15 @@ projectPoint(point_vector, camera){
       var intersect_vector = line(T);
       //console.log(intersect_vector);
       return intersect_vector;*/
-
-      var k = this.distance / (point_vector.x * Math.cos(camera.phi) + point_vector.z * Math.sin(camera.phi));
-      return point_vector.multiply(k);
+      var point = point_vector.add(new Vector(-camera.x,-camera.y,-camera.z));
+      var k = this.distance / (point.x * Math.cos(camera.phi) + point.z * Math.sin(camera.phi));
+      return point.multiply(k);
     }
   }
-
+/*
 projectPointOnSphere(point_vector, camera){
 
-      point_vector.add(new Vector(-camera.x, -camera.y, -camera.z)); //transformace do souradnic s pocatkem v kamere
+      point_vector = point_vector.add(new Vector(-camera.x, -camera.y, -camera.z)); //transformace do souradnic s pocatkem v kamere
     //if(camera.isInFieldOfView(point_vector)){
       return point_vector.multiply(this.r / point_vector.getNorm());
     //}
@@ -220,7 +220,7 @@ transformCoordinateSystemSphere(point, camera){
       return [new_x, point.y];
 
   }
-
+*/
 transformCoordinateSystem(point, camera){
 
     //var new_coord = [point.z, point.y];
@@ -240,6 +240,7 @@ transformCoordinateSystem(point, camera){
                                         [0, 1, 0],
                                         [-cos, 0, sin]]);
 
+
     var transformed_point = rotation_matrix.multiply(point.add(translation));
     return [transformed_point.x, transformed_point.y];
 
@@ -248,7 +249,7 @@ transformCoordinateSystem(point, camera){
 projectCube(cube, camera, graphics){
 
     Debug([{phi: camera.phi}]);
-    Debug([{},{isCubeInFieldOfView: camera.isCubeInFieldOfView(cube)}]);
+    //Debug([{},{isCubeInFieldOfView: camera.isCubeInFieldOfView(cube)}]);
 
     var points = [];
     if(camera.isCubeInFieldOfView(cube)){
@@ -333,31 +334,32 @@ rotate(delta_phi){
 isInFieldOfView(point){
 
     //Debug([{angle: point.getAngleXZ() / Math.PI *180}]);
-    point.add(new Vector(-camera.x, -camera.y, -camera.z));
+    var point_translated = point.add(new Vector(-camera.x, -camera.y, -camera.z));
     var cos_phi = Math.cos(-camera.phi);
     var sin_phi = Math.sin(-camera.phi);
     var rot_Y_matrix = new Tensor(    [[cos_phi, 0, sin_phi],
                                           [0, 1, 0],
                                           [-sin_phi, 0, cos_phi]] );
-    point = rot_Y_matrix.multiply(point);
-
-    var theta = point.getAngleXZ();
-    /*Debug({},{},{rotated_point_x : point.x, rotated_point_z: point.z});
-    var logic_1 = point.z < point.x * Math.tan(this.field_of_view / 2);
-    var logic_2 = point.z > - point.x * Math.tan(this.field_of_view / 2);
-    return (logic_1 && logic_2);    //stale dela problemy, ale o neco mensi*/
+    Debug([{point: point_translated.x}]);
+    point_translated = rot_Y_matrix.multiply(point_translated);
+      //var theta = point_translated.getAngleXZ();
+    //Debug({},{},{rotated_point_x : point.x, rotated_point_z: point.z});
+    var logic_0 = point_translated.x >= 0;
+    var logic_1 = point_translated.z < point_translated.x * Math.tan(this.field_of_view / 2);
+    var logic_2 = point_translated.z > - point_translated.x * Math.tan(this.field_of_view / 2);
+    console.log(point_translated);
+    return (logic_0 && logic_1 && logic_2);
     //Debug([{theta: theta, FOV: this.field_of_view, tan: Math.tan(0.5*theta)}]);
-    var logic_1 = Math.tan(0.5*theta) > Math.tan(-0.5*this.field_of_view/2);
-    var logic_2 = Math.tan(0.5*theta) < Math.tan(0.5*this.field_of_view/2);
-    return logic_1 && logic_2;
+    //var logic_1 = Math.tan(0.5*theta) > Math.tan(-0.5*this.field_of_view/2);
+    //var logic_2 = Math.tan(0.5*theta) < Math.tan(0.5*this.field_of_view/2);
+    //return logic_1 && logic_2;
 
   }
 
 isCubeInFieldOfView(cube){
-
       for(  let vertex_vector of cube.getVerticesCoordinates() ){
-          Debug([{isPointInFOV: this.isInFieldOfView(vertex_vector)}]);
-          if(this.isInFieldOfView(vertex_vector)){  return true;    }
+          Debug([{},{isPointInFOV: this.isInFieldOfView(vertex_vector)}]);
+          if(this.isInFieldOfView(vertex_vector)){ return true;    }
       }
       return false;
   }

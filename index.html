@@ -23,7 +23,7 @@
     var r = can.width / camera.field_of_view;
     plane = new ProjectionPlane(window.innerWidth, window.innerHeight, distance, r);
 
-    cube = new Cube(400,0,20,20, Math.PI / 8);
+    cube = new Cube(400,0,30,20, Math.PI / 1);
 
     plane.projectCube(cube, camera, graphics);
 
@@ -42,8 +42,8 @@
 
 </head>
 <body onload="load();">
-<input type="button" value="<-" onclick="camera.rotate(0.005*Math.PI); redraw();">
-<input type="button" value="->" onclick="camera.rotate(-0.005*Math.PI); redraw();">
+<input type="button" value="<-" onclick="camera.rotate(-0.005*Math.PI); redraw();">
+<input type="button" value="->" onclick="camera.rotate(0.005*Math.PI); redraw();">
 <input type="button" value="^" onclick="camera.move(5*Math.cos(camera.phi),0,5*Math.sin(camera.phi)); redraw();">
 <input type="button" value="<" onclick="camera.move(5*Math.sin(camera.phi),0,-5*Math.cos(camera.phi)); redraw();">
 <input type="button" value=">" onclick="camera.move(-5*Math.sin(camera.phi),0,5*Math.cos(camera.phi)); redraw();">

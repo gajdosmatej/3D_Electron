@@ -13,19 +13,20 @@ class Vector{
 
 
     add(v){
+        var u = new Vector(this.x, this.y, this.z);
         try{
             if(v.constructor != Vector){    throw "Can only add vector to vector"}
             else{
-                this.x += v.x;
-                this.y += v.y;
-                this.z += v.z;
+                u.x += v.x;
+                u.y += v.y;
+                u.z += v.z;
             }
         }
         catch(err){
             console.error(err);
         }
         finally{
-            return this;
+            return u;
         }
     }
 
