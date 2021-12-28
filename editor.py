@@ -1,6 +1,7 @@
 import tkinter
 import math
 import numpy
+import json
 
 class Brick:
     x = None
@@ -22,6 +23,9 @@ class Brick:
 
     def __del__(self):
         self.canvas.canvas.delete(self.tk_handler)
+
+    def toExport(self):
+        return {"x": self.x, "y": self.y, "size": self.size}
 
 
 class MyCanvas:
@@ -144,15 +148,31 @@ class MyCanvas:
                 obj = self.matrix[column, row]
                 self.matrix[column, row] = None
                 del obj
-
+                
 
 top = tkinter.Tk()
 top.title("Editor")
 
+
+def export():
+    matrix = canvas.matrix
+    n1, n2 = matrix.shape
+    obj_list = []
+
+    for i in range(0, n1):
+        for j in range(0, n2):
+            if matrix[i][j] != None:
+                obj_list.append(matrix[i][j].toExport())
+
+    f = open("export.json", "w")
+    f.write(json.dumps(obj_list))
+    f.close()
+
+
 labelTitle = tkinter.Label(top, text="Editor", font="Times 20")
 labelTitle.pack(side=tkinter.TOP)
 #top.attributes('-zoomed', True)
-buttonAdd = tkinter.Button(top, text="Add")
+buttonAdd = tkinter.Button(top, text="Export", command=export)
 buttonAdd.pack(side=tkinter.RIGHT)
 
 radioVar = tkinter.IntVar()
