@@ -7,7 +7,31 @@
 <script language="javascript">
 
   var camera;
-  var cube;
+  <?php
+
+  $import_json = file_get_contents("export.json");
+  $list = json_decode($import_json, true);
+
+  echo "var objects = [";
+
+  for ($i = 1; $i < count($list); $i++) {
+    echo "new Cube(";
+    echo strval($list[$i]["x"]);
+    echo ", 0, ";
+    echo strval($list[$i]["y"]);
+    echo ", ";
+    echo strval($list[$i]["size"]);
+    echo ", 0), ";
+  }
+  echo "new Cube(";
+  echo strval($list[0]["x"]);
+  echo ", 0, ";
+  echo strval($list[0]["y"]);
+  echo ", ";
+  echo strval($list[0]["size"]);
+  echo ", 0)];";
+
+   ?>
   var graphics;
   var plane;
 
@@ -23,16 +47,22 @@
     var r = can.width / camera.field_of_view;
     plane = new ProjectionPlane(window.innerWidth, window.innerHeight, distance, r);
 
-    cube = new Cube(400,0,30,20, Math.PI / 1);
+    //objects.push(new Cube(400,0,30,20, Math.PI / 1));
 
-    plane.projectCube(cube, camera, graphics);
+    project();
+
+  }
+
+  function project(){
+
+    for(obj of objects){  plane.projectCube(obj, camera, graphics); }
 
   }
 
   function redraw(){
 
     graphics.clear();
-    plane.projectCube(cube, camera, graphics);
+    project();
     //console.log(camera.x);
     //console.log(camera.phi);
 

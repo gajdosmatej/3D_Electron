@@ -25,7 +25,7 @@ class Brick:
         self.canvas.canvas.delete(self.tk_handler)
 
     def toExport(self):
-        return {"x": self.x, "y": self.y, "size": self.size}
+        return {"x": self.x-100, "y": self.y-100, "size": self.size}
 
 
 class MyCanvas:
@@ -148,7 +148,7 @@ class MyCanvas:
                 obj = self.matrix[column, row]
                 self.matrix[column, row] = None
                 del obj
-                
+
 
 top = tkinter.Tk()
 top.title("Editor")
