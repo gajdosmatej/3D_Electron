@@ -15,24 +15,6 @@ constructor(x, y, z, len, phi=0) {
     this.position_vector = new Vector(x,y,z);
   }
 
-/*
-  *getVerticesCoordinates(){
-      console.log(this.phi);
-      for(let y_modifier of [-1, 1]){
-          for(let point_reflection of [-1, 1]){
-              for(let goniometric_sign of [-1, 1]){
-
-                var goniometric_x = Math.cos(this.phi) + goniometric_sign * Math.sin(this.phi);
-                var goniometric_z = Math.cos(this.phi) - goniometric_sign * Math.sin(this.phi);
-
-                var position_vector =
-                [ this.x + point_reflection * this.side_len / 2 * goniometric_x,
-                  this.y + y_modifier * this.side_len / 2,
-                  this.z + goniometric_sign * point_reflection * this.side_len / 2 * goniometric_z];
-
-                yield position_vector;
-      }}}
-  }*/
 
 *getVerticesCoordinates(){
 
@@ -163,7 +145,7 @@ class ProjectionPlane{
   distance;
   r = 100;
 
-constructor(w,h, d,r){
+constructor(w,h,d,r){
 
     this.width = w;
     this.height = h;
@@ -175,19 +157,7 @@ constructor(w,h, d,r){
 projectPoint(point_vector, camera){
 
     if(camera.isInFieldOfView(point_vector)){
-/*
-      var direction_vector = point_vector.add(new Vector( -camera.x, -camera.y, -camera.z) );
-      var line = t =>
-      {return new Vector( camera.x + t*direction_vector.x,
-                          camera.y + t*direction_vector.y,
-                          camera.z + t*direction_vector.z);};
 
-      //var T = this.distance / (point_vector.x - camera.x);  //jen pro kameru mířící ve směru x
-      var T = (this.distance - camera.x * Math.cos(camera.phi) - camera.z * Math.cos(camera.phi)) /
-              (direction_vector.x * Math.cos(camera.phi) + direction_vector.z * Math.sin(camera.phi));
-      var intersect_vector = line(T);
-      //console.log(intersect_vector);
-      return intersect_vector;*/
       var point = point_vector.add(new Vector(-camera.x,-camera.y,-camera.z));
       var k = this.distance / (point.x * Math.cos(camera.phi) + point.z * Math.sin(camera.phi));
       return point.multiply(k);
@@ -222,27 +192,21 @@ transformCoordinateSystemSphere(point, camera){
   }
 */
 transformCoordinateSystem(point, camera){
-
-    //var new_coord = [point.z, point.y];
-    /*return [Math.sqrt(point.x * point.x + point.z * point.z - this.distance * this.distance),
-            point.y];*/
-/*    var sign = 1;
-    if(point.z - point.x * Math.tan(camera.phi) > 0){ sign = -1;  } //zamezeni ztraty nekterych bodu vlivem odmocniny
-    var new_coord = [sign * Math.sqrt( point.x ** 2 + point.z ** 2 + this.distance ** 2 -
-            2 * this.distance * (point.x * Math.cos(camera.phi) + point.z * Math.sin(camera.phi)) ),
-            point.y];
-    //console.log(new_coord);
-    return new_coord;*/
-    var cos = Math.cos(camera.phi);
+  /* var cos = Math.cos(camera.phi);
     var sin = Math.sin(camera.phi);
     var translation = new Vector(-this.distance*cos, 0, -this.distance*sin);
     var rotation_matrix = new Tensor(   [[sin, 0, cos],
                                         [0, 1, 0],
-                                        [-cos, 0, sin]]);
+                                        [-cos, 0, sin]]);*/
 
-
+    var cos = Math.cos(-camera.phi);
+    var sin = Math.sin(-camera.phi);
+    var translation = new Vector(-this.distance*cos, 0, -this.distance*sin);
+    var rotation_matrix = new Tensor(   [[cos, 0, sin],
+                                          [0, 1, 0],
+                                      [-sin, 0, cos]]);
     var transformed_point = rotation_matrix.multiply(point.add(translation));
-    return [transformed_point.x, transformed_point.y];
+    return [transformed_point.z, transformed_point.y];
 
   }
 
@@ -257,6 +221,7 @@ projectCube(cube, camera, graphics){
         var nearest_index = null;
         var nearest_distance = null;
         for(  let vertex_vector of cube.getVerticesCoordinates() ){
+
             var displacement =
               (vertex_vector.x - camera.x)**2 + (vertex_vector.y - camera.y)**2 + (vertex_vector.z - camera.z)**2;
             if(nearest_distance == null || nearest_distance > displacement){
@@ -265,7 +230,6 @@ projectCube(cube, camera, graphics){
               nearest_distance = displacement;
 
             }
-
             var intersect_point = this.projectPoint(vertex_vector, camera);
             if(intersect_point == undefined){ continue; }
             var intersect_point_plane = this.transformCoordinateSystem(intersect_point, camera);
@@ -293,7 +257,7 @@ projectCube(cube, camera, graphics){
 
 colorCubeFromSides(graphics, points, sides_indices){
   var col_index = 0;
-  var colors = ["#FF0000", "#00FF00", "#0000FF"];
+  var colors = ["#0000FF", "#0000FF", "#0000FF"];
   for(var side_indices of sides_indices){
 
     var tetragon_points = [];
@@ -333,6 +297,7 @@ rotate(delta_phi){
 
 isInFieldOfView(point){
 
+
     //Debug([{angle: point.getAngleXZ() / Math.PI *180}]);
     var point_translated = point.add(new Vector(-camera.x, -camera.y, -camera.z));
     var cos_phi = Math.cos(-camera.phi);
@@ -340,14 +305,14 @@ isInFieldOfView(point){
     var rot_Y_matrix = new Tensor(    [[cos_phi, 0, sin_phi],
                                           [0, 1, 0],
                                           [-sin_phi, 0, cos_phi]] );
-    Debug([{point: point_translated.x}]);
-    point_translated = rot_Y_matrix.multiply(point_translated);
+    //Debug([{point: point_translated.x}]);
+    var point_rotated = rot_Y_matrix.multiply(point_translated);
       //var theta = point_translated.getAngleXZ();
     //Debug({},{},{rotated_point_x : point.x, rotated_point_z: point.z});
-    var logic_0 = point_translated.x >= 0;
-    var logic_1 = point_translated.z < point_translated.x * Math.tan(this.field_of_view / 2);
-    var logic_2 = point_translated.z > - point_translated.x * Math.tan(this.field_of_view / 2);
-    console.log(point_translated);
+    var logic_0 = point_rotated.x >= 0;
+    var logic_1 = point_rotated.z < point_rotated.x * Math.tan(this.field_of_view / 2);
+    var logic_2 = point_rotated.z > - point_rotated.x * Math.tan(this.field_of_view / 2);
+    console.log(point_rotated);
     return (logic_0 && logic_1 && logic_2);
     //Debug([{theta: theta, FOV: this.field_of_view, tan: Math.tan(0.5*theta)}]);
     //var logic_1 = Math.tan(0.5*theta) > Math.tan(-0.5*this.field_of_view/2);
@@ -358,7 +323,9 @@ isInFieldOfView(point){
 
 isCubeInFieldOfView(cube){
       for(  let vertex_vector of cube.getVerticesCoordinates() ){
-          Debug([{},{isPointInFOV: this.isInFieldOfView(vertex_vector)}]);
+        //Debug([{},{isPointInFOV: this.isInFieldOfView(vertex_vector)}]);
+    }
+      for(  let vertex_vector of cube.getVerticesCoordinates() ){
           if(this.isInFieldOfView(vertex_vector)){ return true;    }
       }
       return false;
