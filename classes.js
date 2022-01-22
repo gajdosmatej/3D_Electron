@@ -210,18 +210,36 @@ transformCoordinateSystem(point, camera){
 
   }
 
+  NEWPROJECTION(point, camera){
+
+    point = point.add(new Vector(-camera.x,-camera.y,-camera.z));
+    var cos = Math.cos(-camera.phi);
+    var sin = Math.sin(-camera.phi);
+    var rotation_matrix = new Tensor(   [[cos, 0, sin],
+                                          [0, 1, 0],
+                                      [-sin, 0, cos]]);
+    point = rotation_matrix.multiply(point);
+    point = point.multiply(this.distance / point.x);
+    point.x -= this.distance;
+    //console.log(point);
+    return [point.z, point.y];
+  }
+
 projectCube(cube, camera, graphics){
 
     Debug([{phi: camera.phi}]);
     //Debug([{},{isCubeInFieldOfView: camera.isCubeInFieldOfView(cube)}]);
 
     var points = [];
+
     if(camera.isCubeInFieldOfView(cube)){
 
         var nearest_index = null;
         var nearest_distance = null;
         for(  let vertex_vector of cube.getVerticesCoordinates() ){
 
+          //nejblizsi hrana
+          {
             var displacement =
               (vertex_vector.x - camera.x)**2 + (vertex_vector.y - camera.y)**2 + (vertex_vector.z - camera.z)**2;
             if(nearest_distance == null || nearest_distance > displacement){
@@ -230,9 +248,12 @@ projectCube(cube, camera, graphics){
               nearest_distance = displacement;
 
             }
-            var intersect_point = this.projectPoint(vertex_vector, camera);
+          }
+
+            /*var intersect_point = this.projectPoint(vertex_vector, camera);
             if(intersect_point == undefined){ continue; }
-            var intersect_point_plane = this.transformCoordinateSystem(intersect_point, camera);
+            var intersect_point_plane = this.transformCoordinateSystem(intersect_point, camera);*/
+            var intersect_point_plane = this.NEWPROJECTION(vertex_vector, camera);
             graphics.drawPoint(intersect_point_plane[0], intersect_point_plane[1]);
             points.push(intersect_point_plane);
 
@@ -250,7 +271,7 @@ projectCube(cube, camera, graphics){
         }
 
         for(let point of points){   Debug([{},{},{point: point}]); }
-        this.colorCubeFromSides(graphics, points, cube.getSidesFromVertex(nearest_index));
+        //this.colorCubeFromSides(graphics, points, cube.getSidesFromVertex(nearest_index));
     //vybarvovaci fce?
     }
 }
@@ -284,7 +305,7 @@ move(delta_x,delta_y,delta_z){
     this.x += delta_x;
     this.y += delta_y;
     this.z += delta_z;
-
+    console.log([delta_x, delta_z]);
 }
 
 rotate(delta_phi){
@@ -312,7 +333,7 @@ isInFieldOfView(point){
     var logic_0 = point_rotated.x >= 0;
     var logic_1 = point_rotated.z < point_rotated.x * Math.tan(this.field_of_view / 2);
     var logic_2 = point_rotated.z > - point_rotated.x * Math.tan(this.field_of_view / 2);
-    console.log(point_rotated);
+  //console.log(point_rotated);
     return (logic_0 && logic_1 && logic_2);
     //Debug([{theta: theta, FOV: this.field_of_view, tan: Math.tan(0.5*theta)}]);
     //var logic_1 = Math.tan(0.5*theta) > Math.tan(-0.5*this.field_of_view/2);
