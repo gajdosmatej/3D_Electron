@@ -23,9 +23,9 @@ constructor(x, y, z, len, phi=0) {
 
       for(let centre_vertex_vector of this.getRelativeVerticesCoordinates()){;
 
-          var rot_Y_matrix = new Tensor(    [[cos_phi, 0, sin_phi],
+          var rot_Y_matrix = new Tensor(    [[cos_phi, 0, -sin_phi],
                                             [0, 1, 0],
-                                            [-sin_phi, 0, cos_phi]] );
+                                            [sin_phi, 0, cos_phi]] );
 
           var rot_centre_vertex_vector = rot_Y_matrix.multiply(centre_vertex_vector);
           var vertex_vector = rot_centre_vertex_vector.add( new Vector(this.x, this.y, this.z) );
@@ -154,7 +154,7 @@ constructor(w,h,d,r){
 
   }
 
-projectPoint(point_vector, camera){
+/*projectPoint(point_vector, camera){
 
     if(camera.isInFieldOfView(point_vector)){
 
@@ -163,7 +163,7 @@ projectPoint(point_vector, camera){
       return point.multiply(k);
     }
   }
-/*
+
 projectPointOnSphere(point_vector, camera){
 
       point_vector = point_vector.add(new Vector(-camera.x, -camera.y, -camera.z)); //transformace do souradnic s pocatkem v kamere
@@ -190,34 +190,34 @@ transformCoordinateSystemSphere(point, camera){
       return [new_x, point.y];
 
   }
-*/
+
 transformCoordinateSystem(point, camera){
-  /* var cos = Math.cos(camera.phi);
+   var cos = Math.cos(camera.phi);
     var sin = Math.sin(camera.phi);
     var translation = new Vector(-this.distance*cos, 0, -this.distance*sin);
     var rotation_matrix = new Tensor(   [[sin, 0, cos],
                                         [0, 1, 0],
-                                        [-cos, 0, sin]]);*/
+                                        [-cos, 0, sin]]);
 
     var cos = Math.cos(-camera.phi);
     var sin = Math.sin(-camera.phi);
     var translation = new Vector(-this.distance*cos, 0, -this.distance*sin);
-    var rotation_matrix = new Tensor(   [[cos, 0, sin],
+    var rotation_matrix = new Tensor(   [[cos, 0, -sin],
                                           [0, 1, 0],
-                                      [-sin, 0, cos]]);
+                                      [sin, 0, cos]]);
     var transformed_point = rotation_matrix.multiply(point.add(translation));
     return [transformed_point.z, transformed_point.y];
 
-  }
+  }*/
 
   NEWPROJECTION(point, camera){
 
     point = point.add(new Vector(-camera.x,-camera.y,-camera.z));
     var cos = Math.cos(-camera.phi);
     var sin = Math.sin(-camera.phi);
-    var rotation_matrix = new Tensor(   [[cos, 0, sin],
+    var rotation_matrix = new Tensor(   [[cos, 0, -sin],
                                           [0, 1, 0],
-                                      [-sin, 0, cos]]);
+                                      [sin, 0, cos]]);
     point = rotation_matrix.multiply(point);
     point = point.multiply(this.distance / point.x);
     point.x -= this.distance;
@@ -323,9 +323,9 @@ isInFieldOfView(point){
     var point_translated = point.add(new Vector(-camera.x, -camera.y, -camera.z));
     var cos_phi = Math.cos(-camera.phi);
     var sin_phi = Math.sin(-camera.phi);
-    var rot_Y_matrix = new Tensor(    [[cos_phi, 0, sin_phi],
+    var rot_Y_matrix = new Tensor(    [[cos_phi, 0, -sin_phi],
                                           [0, 1, 0],
-                                          [-sin_phi, 0, cos_phi]] );
+                                          [sin_phi, 0, cos_phi]] );
     //Debug([{point: point_translated.x}]);
     var point_rotated = rot_Y_matrix.multiply(point_translated);
       //var theta = point_translated.getAngleXZ();
