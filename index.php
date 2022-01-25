@@ -60,7 +60,7 @@
   }
 
   function redraw(){
-
+    console.log([camera.x,camera.z]);
     graphics.clear();
     project();
     //console.log(camera.x);
@@ -72,12 +72,12 @@
 
 </head>
 <body onload="load();">
-<input type="button" value="<-" onclick="camera.rotate(0.005*Math.PI); redraw();">
-<input type="button" value="->" onclick="camera.rotate(-0.005*Math.PI); redraw();">
-<input type="button" value="^" onclick="camera.move(10*Math.cos(camera.phi),0,10*Math.sin(camera.phi)); redraw();">
-<input type="button" value="<" onclick="camera.move(10*Math.sin(camera.phi),0,-10*Math.cos(camera.phi)); redraw();">
-<input type="button" value=">" onclick="camera.move(-10*Math.sin(camera.phi),0,10*Math.cos(camera.phi)); redraw();">
-<input type="button" value="v" onclick="camera.move(-10*Math.cos(camera.phi),0,-10*Math.sin(camera.phi)); redraw();">
+<input type="button" value="<-" onclick="camera.rotate(-0.005*Math.PI); redraw();">
+<input type="button" value="->" onclick="camera.rotate(0.005*Math.PI); redraw();">
+<input type="button" value="^" onclick="camera.move(10*Math.cos(camera.phi),0,-10*Math.sin(camera.phi)); redraw();">
+<input type="button" value="<" onclick="camera.move(-10*Math.sin(camera.phi),0,-10*Math.cos(camera.phi)); redraw();">
+<input type="button" value=">" onclick="camera.move(10*Math.sin(camera.phi),0,10*Math.cos(camera.phi)); redraw();">
+<input type="button" value="v" onclick="camera.move(-10*Math.cos(camera.phi),0,10*Math.sin(camera.phi)); redraw();">
 <div>
 <canvas id="cnv" style="border: solid 1px;"></canvas>
 <div style="height: 15px; position:absolute; top: 50%; left: 50%; width: 15px; background-color: #000;"></div>
