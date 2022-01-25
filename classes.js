@@ -271,14 +271,14 @@ projectCube(cube, camera, graphics){
         }
 
         for(let point of points){   Debug([{},{},{point: point}]); }
-        //this.colorCubeFromSides(graphics, points, cube.getSidesFromVertex(nearest_index));
+        this.colorCubeFromSides(graphics, points, cube.getSidesFromVertex(nearest_index));
     //vybarvovaci fce?
     }
 }
 
 colorCubeFromSides(graphics, points, sides_indices){
   var col_index = 0;
-  var colors = ["#0000FF", "#0000FF", "#0000FF"];
+  var colors = ["#000022", "#000022", "#000022"];
   for(var side_indices of sides_indices){
 
     var tetragon_points = [];
