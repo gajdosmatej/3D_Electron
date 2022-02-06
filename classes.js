@@ -145,7 +145,7 @@ class ProjectionPlane{
   distance;
   r = 100;
 
-constructor(w,h,d,r){
+  constructor(w,h,d,r){
 
     this.width = w;
     this.height = h;
@@ -154,63 +154,8 @@ constructor(w,h,d,r){
 
   }
 
-/*projectPoint(point_vector, camera){
 
-    if(camera.isInFieldOfView(point_vector)){
-
-      var point = point_vector.add(new Vector(-camera.x,-camera.y,-camera.z));
-      var k = this.distance / (point.x * Math.cos(camera.phi) + point.z * Math.sin(camera.phi));
-      return point.multiply(k);
-    }
-  }
-
-projectPointOnSphere(point_vector, camera){
-
-      point_vector = point_vector.add(new Vector(-camera.x, -camera.y, -camera.z)); //transformace do souradnic s pocatkem v kamere
-    //if(camera.isInFieldOfView(point_vector)){
-      return point_vector.multiply(this.r / point_vector.getNorm());
-    //}
-  }
-
-transformCoordinateSystemSphere(point, camera){
-
-      var cos_theta = (point.x * Math.cos(camera.phi) + point.z * Math.sin(camera.phi)) / Math.sqrt(point.x **2 + point.z **2);
-      var sgn = 1;
-      var cos_phi = Math.cos(camera.phi);
-      var sin_phi = Math.sin(camera.phi);
-      var rot_Y_matrix = new Tensor(    [[cos_phi, 0, sin_phi],
-                                            [0, 1, 0],
-                                            [-sin_phi, 0, cos_phi]] );
-
-      var new_point = rot_Y_matrix.multiply(point);
-      if(new_point.z < 0){  sgn = -1;   }
-      var new_x = sgn * this.r * Math.acos(cos_theta);
-      //console.log(camera.phi / Math.PI * 180);
-      //console.log(new_x);
-      return [new_x, point.y];
-
-  }
-
-transformCoordinateSystem(point, camera){
-   var cos = Math.cos(camera.phi);
-    var sin = Math.sin(camera.phi);
-    var translation = new Vector(-this.distance*cos, 0, -this.distance*sin);
-    var rotation_matrix = new Tensor(   [[sin, 0, cos],
-                                        [0, 1, 0],
-                                        [-cos, 0, sin]]);
-
-    var cos = Math.cos(-camera.phi);
-    var sin = Math.sin(-camera.phi);
-    var translation = new Vector(-this.distance*cos, 0, -this.distance*sin);
-    var rotation_matrix = new Tensor(   [[cos, 0, -sin],
-                                          [0, 1, 0],
-                                      [sin, 0, cos]]);
-    var transformed_point = rotation_matrix.multiply(point.add(translation));
-    return [transformed_point.z, transformed_point.y];
-
-  }*/
-
-  NEWPROJECTION(point, camera){
+  projectPoint(point, camera){
 
     point = point.add(new Vector(-camera.x,-camera.y,-camera.z));
     var cos = Math.cos(-camera.phi);
@@ -221,15 +166,11 @@ transformCoordinateSystem(point, camera){
     point = rotation_matrix.multiply(point);
     point = point.multiply(this.distance / point.x);
     point.x -= this.distance;
-    //console.log(point);
+
     return [point.z, point.y];
   }
 
 projectCube(cube, camera, graphics){
-
-    Debug([{phi: camera.phi}]);
-    //Debug([{},{isCubeInFieldOfView: camera.isCubeInFieldOfView(cube)}]);
-
     var points = [];
 
     if(camera.isCubeInFieldOfView(cube)){
@@ -238,30 +179,21 @@ projectCube(cube, camera, graphics){
         var nearest_distance = null;
         for(  let vertex_vector of cube.getVerticesCoordinates() ){
 
-          //nejblizsi hrana
-          {
-            var displacement =
-              (vertex_vector.x - camera.x)**2 + (vertex_vector.y - camera.y)**2 + (vertex_vector.z - camera.z)**2;
-            if(nearest_distance == null || nearest_distance > displacement){
-
-              nearest_index = points.length;
-              nearest_distance = displacement;
-
-            }
-          }
-
-            /*var intersect_point = this.projectPoint(vertex_vector, camera);
-            if(intersect_point == undefined){ continue; }
-            var intersect_point_plane = this.transformCoordinateSystem(intersect_point, camera);*/
-            var intersect_point_plane = this.NEWPROJECTION(vertex_vector, camera);
+            var intersect_point_plane = this.projectPoint(vertex_vector, camera);
             graphics.drawPoint(intersect_point_plane[0], intersect_point_plane[1]);
             points.push(intersect_point_plane);
 
-            /*
-            var intersect_point = this.projectPointOnSphere(vertex_vector, camera);
-            var intersect_point_sphere = this.transformCoordinateSystemSphere(intersect_point, camera);
-            graphics.drawPoint(intersect_point_sphere[0], intersect_point_sphere[1]);
-            points.push(intersect_point_sphere);*/
+            //nejblizsi hrana
+            {
+              var displacement =
+                (vertex_vector.x - camera.x)**2 + (vertex_vector.y - camera.y)**2 + (vertex_vector.z - camera.z)**2;
+              if(nearest_distance == null || nearest_distance > displacement){
+
+                nearest_index = points.length;
+                nearest_distance = displacement;
+
+              }
+            }
         }
 
         for(let i = 0; i < points.length; ++i){
@@ -270,9 +202,7 @@ projectCube(cube, camera, graphics){
           }
         }
 
-        for(let point of points){   Debug([{},{},{point: point}]); }
         this.colorCubeFromSides(graphics, points, cube.getSidesFromVertex(nearest_index));
-    //vybarvovaci fce?
     }
 }
 
@@ -318,28 +248,20 @@ rotate(delta_phi){
 
 isInFieldOfView(point){
 
-
-    //Debug([{angle: point.getAngleXZ() / Math.PI *180}]);
     var point_translated = point.add(new Vector(-camera.x, -camera.y, -camera.z));
     var cos_phi = Math.cos(-camera.phi);
     var sin_phi = Math.sin(-camera.phi);
     var rot_Y_matrix = new Tensor(    [[cos_phi, 0, -sin_phi],
                                           [0, 1, 0],
                                           [sin_phi, 0, cos_phi]] );
-    //Debug([{point: point_translated.x}]);
+
     var point_rotated = rot_Y_matrix.multiply(point_translated);
-      //var theta = point_translated.getAngleXZ();
-    //Debug({},{},{rotated_point_x : point.x, rotated_point_z: point.z});
+
     var logic_0 = point_rotated.x >= 0;
     var logic_1 = point_rotated.z < point_rotated.x * Math.tan(this.field_of_view / 2);
     var logic_2 = point_rotated.z > - point_rotated.x * Math.tan(this.field_of_view / 2);
-  //console.log(point_rotated);
-    return (logic_0 && logic_1 && logic_2);
-    //Debug([{theta: theta, FOV: this.field_of_view, tan: Math.tan(0.5*theta)}]);
-    //var logic_1 = Math.tan(0.5*theta) > Math.tan(-0.5*this.field_of_view/2);
-    //var logic_2 = Math.tan(0.5*theta) < Math.tan(0.5*this.field_of_view/2);
-    //return logic_1 && logic_2;
 
+    return (logic_0 && logic_1 && logic_2);
   }
 
 isCubeInFieldOfView(cube){
