@@ -44,13 +44,9 @@ constructor(x, y, z, len, phi=0) {
       }}}
   }
 
-getSidesFromVertex(vertex_index){
-
+getSidesFromVertex(vertex_indices){
     var sides = [[0,1,2,3], [4,5,6,7], [0,1,4,5], [2,3,6,7], [0,2,4,6], [1,3,5,7]];
-    var selected_sides = [];
-    for(let i = 0; i < sides.length; ++i){
-        if(sides[i].includes(vertex_index)){    selected_sides.push(sides[i]); }
-    }
+    var selected_sides = sides.filter(side => vertex_indices.every(i => side.includes(i)));
     return selected_sides;
 }
 }
@@ -175,25 +171,28 @@ projectCube(cube, camera, graphics){
 
     if(camera.isCubeInFieldOfView(cube)){
 
-        var nearest_index = null;
+        var nearest_indices = [];
         var nearest_distance = null;
         for(  let vertex_vector of cube.getVerticesCoordinates() ){
 
             var intersect_point_plane = this.projectPoint(vertex_vector, camera);
             graphics.drawPoint(intersect_point_plane[0], intersect_point_plane[1]);
             points.push(intersect_point_plane);
-
             //nejblizsi hrana
             {
               var displacement =
                 (vertex_vector.x - camera.x)**2 + (vertex_vector.y - camera.y)**2 + (vertex_vector.z - camera.z)**2;
-              if(nearest_distance == null || nearest_distance > displacement){
 
-                nearest_index = points.length;
+              if(nearest_distance == null || nearest_distance == displacement){
+                nearest_indices.push(points.length - 1);
                 nearest_distance = displacement;
-
+              }
+              else if(nearest_distance > displacement){
+                nearest_indices[0] = points.length - 1;
+                nearest_distance = displacement;
               }
             }
+
         }
 
         for(let i = 0; i < points.length; ++i){
@@ -202,17 +201,20 @@ projectCube(cube, camera, graphics){
           }
         }
 
-        this.colorCubeFromSides(graphics, points, cube.getSidesFromVertex(nearest_index));
+        var sides_indices = cube.getSidesFromVertex(nearest_indices);
+        this.colorCubeFromSides(graphics, points, sides_indices);
     }
 }
 
+
 colorCubeFromSides(graphics, points, sides_indices){
   var col_index = 0;
-  var colors = ["#000022", "#000022", "#000022"];
-  for(var side_indices of sides_indices){
+  var colors = ["#800", "#080", "#008"];
+  //console.log(sides_indices);
+  for(var side of sides_indices){
 
     var tetragon_points = [];
-    for(let i=0; i<4; ++i){ tetragon_points.push(points[side_indices[i]]); }
+    for(let i=0; i<4; ++i){ tetragon_points.push(points[side[i]]); }
 
     tetragon_points = graphics.rearangeTetragonCoords(tetragon_points);
 
