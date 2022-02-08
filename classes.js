@@ -256,7 +256,7 @@ colliding(cubes, translation_vector){
         var z_diff = Math.abs(cube.z - this.z - translation_vector.z);
         var x_diff = Math.abs(cube.x - this.x - translation_vector.x);
 
-        if(z_diff <= cube.side_len && x_diff <= cube.side_len){ return true;    }
+        if(z_diff <= 5/8*cube.side_len && x_diff <= 5/8*cube.side_len){ return true;    }
     }
     return false;
 }
