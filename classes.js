@@ -250,6 +250,7 @@ rotate(delta_phi){
 
   }
 
+//neni dokonale - funguje pro nenatocene krychle a zamezi veskeremu pohybu
 colliding(cubes, translation_vector){
     for(let cube of cubes){
         var z_diff = Math.abs(cube.z - this.z - translation_vector.z);
