@@ -188,7 +188,7 @@ projectCube(cube, camera, graphics){
                 nearest_distance = displacement;
               }
               else if(nearest_distance > displacement){
-                nearest_indices[0] = points.length - 1;
+                nearest_indices = [points.length - 1];
                 nearest_distance = displacement;
               }
             }
@@ -237,7 +237,6 @@ move(delta_x,delta_y,delta_z){
     this.x += delta_x;
     this.y += delta_y;
     this.z += delta_z;
-    console.log([delta_x, delta_z]);
 }
 
 rotate(delta_phi){

@@ -65,7 +65,6 @@
   }
 
   function redraw(){
-    console.log([camera.x,camera.z]);
     graphics.clear();
     project();
     //console.log(camera.x);
