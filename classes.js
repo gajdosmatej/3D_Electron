@@ -45,7 +45,7 @@ constructor(x, y, z, len, phi=0) {
   }
 
 getSidesFromVertex(vertex_indices){
-    var sides = [[0,1,2,3], [4,5,6,7], [0,1,4,5], [2,3,6,7], [0,2,4,6], [1,3,5,7]];
+    var sides = [[0,1,3,2], [4,5,7,6], [0,1,4,5], [2,3,6,7], [0,2,6,4], [1,3,7,5]];
     var selected_sides = sides.filter(side => vertex_indices.every(i => side.includes(i)));
     return selected_sides;
 }
@@ -108,7 +108,7 @@ clear(){
 
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   }
-
+/*
 rearangeTetragonCoords(coords){
     var dist_quad = (coord1, coord2) => (coord1[0] - coord2[0])**2 + (coord1[1] - coord2[1])**2;
     var new_coords = [coords[0]];
@@ -131,7 +131,8 @@ rearangeTetragonCoords(coords){
       new_coords.push(remain_coords[1], remain_coords[0]);
       return new_coords;
     }
-  }
+}*/
+
 }
 
 class ProjectionPlane{
@@ -216,8 +217,7 @@ colorCubeFromSides(graphics, points, sides_indices){
     var tetragon_points = [];
     for(let i=0; i<4; ++i){ tetragon_points.push(points[side[i]]); }
 
-    tetragon_points = graphics.rearangeTetragonCoords(tetragon_points);
-
+    //tetragon_points = graphics.rearangeTetragonCoords(tetragon_points);
     graphics.fillTetragon(tetragon_points[0], tetragon_points[1], tetragon_points[2], tetragon_points[3], colors[col_index]);
     //console.log(colors[col_index]);
     col_index += 1;
