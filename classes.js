@@ -233,10 +233,13 @@ z = 0;
 phi = 0*Math.PI;
 field_of_view = 0.8*Math.PI/6;
 
-move(delta_x,delta_y,delta_z){
-    this.x += delta_x;
-    this.y += delta_y;
-    this.z += delta_z;
+move(delta_x,delta_y,delta_z, cubes){
+
+    if(!this.colliding(cubes, new Vector(delta_x, delta_y, delta_z))){
+        this.x += delta_x;
+        this.y += delta_y;
+        this.z += delta_z;
+    }
 }
 
 rotate(delta_phi){
@@ -246,6 +249,16 @@ rotate(delta_phi){
     while(this.phi < 0){ this.phi += 2*Math.PI;  }
 
   }
+
+colliding(cubes, translation_vector){
+    for(let cube of cubes){
+        var z_diff = Math.abs(cube.z - this.z - translation_vector.z);
+        var x_diff = Math.abs(cube.x - this.x - translation_vector.x);
+
+        if(z_diff <= cube.side_len && x_diff <= cube.side_len){ return true;    }
+    }
+    return false;
+}
 
 isInFieldOfView(point){
 

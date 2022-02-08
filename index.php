@@ -124,16 +124,16 @@
   function move(index){
       switch(index){
           case 0:
-            camera.move(VELOCITY/MOVE_FPS*Math.cos(camera.phi),0,VELOCITY/MOVE_FPS*Math.sin(camera.phi));
+            camera.move(VELOCITY/MOVE_FPS*Math.cos(camera.phi),0,VELOCITY/MOVE_FPS*Math.sin(camera.phi), objects);
             break;
           case 1:
-            camera.move(-VELOCITY/MOVE_FPS*Math.cos(camera.phi),0,-VELOCITY/MOVE_FPS*Math.sin(camera.phi));
+            camera.move(-VELOCITY/MOVE_FPS*Math.cos(camera.phi),0,-VELOCITY/MOVE_FPS*Math.sin(camera.phi), objects);
             break;
           case 2:
-            camera.move(VELOCITY/MOVE_FPS*Math.sin(camera.phi),0,-VELOCITY/MOVE_FPS*Math.cos(camera.phi));
+            camera.move(VELOCITY/MOVE_FPS*Math.sin(camera.phi),0,-VELOCITY/MOVE_FPS*Math.cos(camera.phi), objects);
             break;
           case 3:
-            camera.move(-VELOCITY/MOVE_FPS*Math.sin(camera.phi),0,VELOCITY/MOVE_FPS*Math.cos(camera.phi));
+            camera.move(-VELOCITY/MOVE_FPS*Math.sin(camera.phi),0,VELOCITY/MOVE_FPS*Math.cos(camera.phi), objects);
             break;
           case 4:
             camera.rotate(-ANGULAR_VELOCITY/MOVE_FPS);
