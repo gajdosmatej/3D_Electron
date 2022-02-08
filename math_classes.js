@@ -111,3 +111,17 @@ class Tensor{
   }
 
 }*/
+
+var Mathematics = {
+    //nejdriv se vykresluji vzdalene objekty, aby je ty bliz prekryly
+    sortRenderQueue(cubes, camera){
+
+        var compare_func = function(A, B){
+            var norm_A = (A.x - camera.x)**2 + (A.y - camera.y)**2 + (A.z - camera.z)**2;
+            var norm_B = (B.x - camera.x)**2 + (B.y - camera.y)**2 + (B.z - camera.z)**2;
+            return norm_B - norm_A;
+
+        }
+        return cubes.sort(compare_func);
+    }
+}

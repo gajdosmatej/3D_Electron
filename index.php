@@ -53,7 +53,7 @@
     plane = new ProjectionPlane(can.width, can.height, distance, r);
 
     //objects.push(new Cube(400,0,30,20, Math.PI / 1));
-
+    objects = Mathematics.sortRenderQueue(objects, camera);
     project();
 
   }
@@ -66,6 +66,7 @@
 
   function redraw(){
     graphics.clear();
+    objects = Mathematics.sortRenderQueue(objects, camera);
     project();
     //console.log(camera.x);
     //console.log(camera.phi);
