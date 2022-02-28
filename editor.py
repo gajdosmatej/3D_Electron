@@ -24,8 +24,8 @@ class Brick:
     def __del__(self):
         self.canvas.canvas.delete(self.tk_handler)
 
-    def toExport(self):
-        return {"x": self.x-100, "y": self.y-100, "size": self.size}
+    def toExport(self, myCanvas):
+        return {"x": self.x - myCanvas.cameraX, "y": self.y - myCanvas.cameraY, "size": self.size}
 
 
 class MyCanvas:
@@ -133,6 +133,14 @@ class MyCanvas:
         y_vals = [i*self.grid_step for i in range(0, col_num)]
         return {(x,y) for x in x_vals for y in y_vals}
 
+    isCameraPlaced = False
+    cameraX, cameraY = 0, 0
+
+    def placeCamera(self, x, y):
+        self.isCameraPlaced = True
+        self.cameraX, self.cameraY = x, y
+        self.canvas.create_oval(x+self.grid_step/2-10, y+self.grid_step/2-10, x+self.grid_step/2+10, y+self.grid_step/2+10)
+
 
     def mouseClick(self, event):
         vertex = self.getVertexFromMouse(event)
@@ -140,7 +148,7 @@ class MyCanvas:
         column = vertex[0] // self.grid_step
 
         if radioVar.get() == 1:
-            if self.matrix[column, row] == None:
+            if self.matrix[column, row] == None:    #muze v budoucnu delat problem - pri presunu kamery se starym cihlam nezmeni souradnice
                 self.matrix[column, row] = Brick(vertex[0], vertex[1], self.grid_step, self, "#00AA00")
 
         elif radioVar.get() == 2:
@@ -148,7 +156,9 @@ class MyCanvas:
                 obj = self.matrix[column, row]
                 self.matrix[column, row] = None
                 del obj
-
+        elif radioVar.get() == 3:
+            if (self.matrix[column, row] == None) and (not self.isCameraPlaced):
+                self.placeCamera(vertex[0], vertex[1])
 
 top = tkinter.Tk()
 top.title("Editor")
@@ -162,7 +172,7 @@ def export():
     for i in range(0, n1):
         for j in range(0, n2):
             if matrix[i][j] != None:
-                obj_list.append(matrix[i][j].toExport())
+                obj_list.append(matrix[i][j].toExport(canvas))
 
     f = open("export.json", "w")
     f.write(json.dumps(obj_list))
@@ -181,6 +191,8 @@ radioCursor.pack()
 radioPaint = tkinter.Radiobutton(top, text="Paint", variable=radioVar, value=1)
 radioPaint.pack()
 radioDelete = tkinter.Radiobutton(top, text="Delete", variable=radioVar, value=2)
+radioDelete.pack()
+radioDelete = tkinter.Radiobutton(top, text="Camera", variable=radioVar, value=3)
 radioDelete.pack()
 radioVar.set(0)
 
