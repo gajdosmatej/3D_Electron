@@ -33,6 +33,14 @@ constructor(x, y, z, len, phi=0) {
     }
   }
 
+  getVerticesList(){
+      var list = [];
+      for(let vertex of this.getVerticesCoordinates()){
+          list.push(vertex);
+      }
+      return list;
+  }
+
 *getRelativeVerticesCoordinates(){
       for(let x_modifier of [-1, 1]){
           for(let y_modifier of [-1, 1]){
@@ -49,7 +57,56 @@ getSidesFromVertex(vertex_indices){
     var selected_sides = sides.filter(side => vertex_indices.every(i => side.includes(i)));
     return selected_sides;
 }
+
+
+getSidePointsFromPosition(camera_vector){
+    var relative_vector = new Vector(this.x, this.y, this.z).add(camera_vector.multiply(-1));
+    var points = this.getVerticesList();
+
+    var filterFunc = value => {return value.y > 0;  };
+    var mapFuncZero = value => {value.y = 0; return value;  }
+    //var mapFuncNorm = value => {return value.getNorm(); }
+    function mapFuncNorm(relative_vector) {
+    return function(value){
+        return value.add(camera_vector.multiply(-1)).getNorm();
+    }}
+
+    var points = points.filter(filterFunc).map(mapFuncZero);
+    var point_norms = points.map(mapFuncNorm(camera_vector) );
+    //console.log(point_norms);
+    var point1_index = Mathematics.getSmallestValueIndex(point_norms);
+    var point1 = points[point1_index];
+
+    point_norms.splice(point1_index, 1);
+    points.splice(point1_index, 1);
+
+    var point2_index = Mathematics.getSmallestValueIndex(point_norms);
+    var point2 = points[point2_index];
+
+    return [point1, point2];
 }
+
+
+getSideNormalVector(camera_vector){
+    var side_points = this.getSidePointsFromPosition(camera_vector);
+    var normal_vector = new Vector(side_points[1].z - side_points[0].z, 0, side_points[0].x - side_points[1].x);
+
+    normal_vector = normal_vector.multiply(1 / normal_vector.getNorm());
+    console.log(normal_vector);
+    //console.log(side_points);
+    var relat_vector = camera_vector.add(new Vector(-this.x, -this.y, -this.z));
+    console.log(relat_vector);
+    console.log(relat_vector.add(normal_vector));
+    if(relat_vector.getNorm() < relat_vector.add(normal_vector).getNorm()){
+        normal_vector = normal_vector.multiply(-1);
+    }
+
+    /*console.log(relat_vector.add(normal_vector).getNorm());*/
+
+    return normal_vector;
+}
+}
+
 
 
 class GraphicsControl{
@@ -169,7 +226,7 @@ class ProjectionPlane{
 
 projectCube(cube, camera, graphics){
     var points = [];
-
+    cube.getSideNormalVector(new Vector(camera.x, camera.y, camera.z));
     if(camera.isCubeInFieldOfView(cube)){
 
         var nearest_indices = [];
@@ -249,6 +306,7 @@ rotate(delta_phi){
     while(this.phi < 0){ this.phi += 2*Math.PI;  }
 
   }
+
 
 //neni dokonale - funguje pro nenatocene krychle a zamezi veskeremu pohybu
 colliding(cubes, translation_vector){

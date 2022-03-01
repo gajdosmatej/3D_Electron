@@ -123,5 +123,15 @@ var Mathematics = {
 
         }
         return cubes.sort(compare_func);
+    },
+
+    getSmallestValueIndex(list){
+        var smallest = Infinity;
+        var index = -1;
+
+        for(var i = 0; i < list.length; ++i){
+            if(list[i] < smallest){ smallest = list[i]; index = i;  }
+        }
+        return index;
     }
 }
