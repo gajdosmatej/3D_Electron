@@ -60,7 +60,7 @@ getSidesFromVertex(vertex_indices){
 
 
 getSidePointsFromPosition(camera_vector){
-    var relative_vector = new Vector(this.x, this.y, this.z).add(camera_vector.multiply(-1));
+    var relative_vector = new Vector(this.x, this.y, this.z).add(camera_vector.opposite());
     var points = this.getVerticesList();
 
     var filterFunc = value => {return value.y > 0;  };
@@ -68,7 +68,7 @@ getSidePointsFromPosition(camera_vector){
     //var mapFuncNorm = value => {return value.getNorm(); }
     function mapFuncNorm(relative_vector) {
     return function(value){
-        return value.add(camera_vector.multiply(-1)).getNorm();
+        return value.add(camera_vector.opposite()).getNorm();
     }}
 
     var points = points.filter(filterFunc).map(mapFuncZero);
@@ -89,19 +89,15 @@ getSidePointsFromPosition(camera_vector){
 
 getSideNormalVector(camera_vector){
     var side_points = this.getSidePointsFromPosition(camera_vector);
-    var normal_vector = new Vector(side_points[1].z - side_points[0].z, 0, side_points[0].x - side_points[1].x);
 
+    var normal_vector = new Vector(side_points[1].z - side_points[0].z, 0, side_points[0].x - side_points[1].x);
     normal_vector = normal_vector.multiply(1 / normal_vector.getNorm());
-    console.log(normal_vector);
-    //console.log(side_points);
+
     var relat_vector = camera_vector.add(new Vector(-this.x, -this.y, -this.z));
-    console.log(relat_vector);
-    console.log(relat_vector.add(normal_vector));
+
     if(relat_vector.getNorm() < relat_vector.add(normal_vector).getNorm()){
         normal_vector = normal_vector.multiply(-1);
     }
-
-    /*console.log(relat_vector.add(normal_vector).getNorm());*/
 
     return normal_vector;
 }
@@ -292,10 +288,24 @@ field_of_view = 0.8*Math.PI/6;
 
 move(delta_x,delta_y,delta_z, cubes){
 
-    if(!this.colliding(cubes, new Vector(delta_x, delta_y, delta_z))){
+    var translation_vector = new Vector(delta_x, delta_y, delta_z);
+    var collision_cube = this.colliding(cubes, translation_vector)
+
+    if(collision_cube == null){
         this.x += delta_x;
         this.y += delta_y;
         this.z += delta_z;
+    }
+    else{
+
+        var side_normal_vector = collision_cube.getSideNormalVector(new Vector(this.x, this.y, this.z));
+        var normal_projection = side_normal_vector.multiply( side_normal_vector.dotProduct(translation_vector) );
+        var tangent_projection = translation_vector.add( normal_projection.opposite() );
+
+        this.x += tangent_projection.x;
+        this.y += tangent_projection.y;
+        this.z += tangent_projection.z;
+        console.log(this.x + " " + this.z);
     }
 }
 
@@ -314,9 +324,9 @@ colliding(cubes, translation_vector){
         var z_diff = Math.abs(cube.z - this.z - translation_vector.z);
         var x_diff = Math.abs(cube.x - this.x - translation_vector.x);
 
-        if(z_diff <= 5/8*cube.side_len && x_diff <= 5/8*cube.side_len){ return true;    }
+        if(z_diff <= 5/8*cube.side_len && x_diff <= 5/8*cube.side_len){ return cube;    }
     }
-    return false;
+    return null;
 }
 
 isInFieldOfView(point){

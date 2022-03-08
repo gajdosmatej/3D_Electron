@@ -38,6 +38,14 @@ class Vector{
         return new Vector(this.x * scalar, this.y * scalar, this.z * scalar);
     }
 
+    dotProduct(vector){
+        return (this.x * vector.x + this.y * vector.y + this.z * vector.z);
+    }
+
+    opposite(){
+        return this.multiply(-1);
+    }
+
     getAngleXZ(){
 
         if(this.x >= 0 && this.z >= 0){    return Math.atan(this.z / this.x);  }
