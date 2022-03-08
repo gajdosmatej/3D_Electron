@@ -146,6 +146,16 @@ fillTetragon(coord1, coord2, coord3, coord4, color){
     this.ctx.fillStyle = color;
     this.ctx.fill();
 
+    var texture = new Image();
+    texture.src = 'woodTexture.jpg';
+
+    var tan = (coord1[1] - coord2[1]) / (coord1[0] - coord2[0]);
+    var size = Math.abs(coord1[0] - coord2[0]);
+    
+    this.ctx.setTransform(1, tan, 0, 1, 0, 0);
+    this.ctx.drawImage(texture, coord1[0] + this.offset[0], coord1[1] + this.offset[1], size, size);
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+
   }
 
 drawLine(coord_1, coord_2){
