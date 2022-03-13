@@ -135,13 +135,14 @@ drawPoint(x,y){
 
   }
 
+//RU -> RD -> LU -> LD ale U a D zamenene (y roste dolu)
 fillTetragon(coord1, coord2, coord3, coord4, color){
 
     this.ctx.beginPath();
     this.ctx.moveTo(coord1[0] + this.offset[0], coord1[1] + this.offset[1]);
     this.ctx.lineTo(coord2[0] + this.offset[0], coord2[1] + this.offset[1]);
-    this.ctx.lineTo(coord3[0] + this.offset[0], coord3[1] + this.offset[1]);
     this.ctx.lineTo(coord4[0] + this.offset[0], coord4[1] + this.offset[1]);
+    this.ctx.lineTo(coord3[0] + this.offset[0], coord3[1] + this.offset[1]);
     this.ctx.closePath();
     this.ctx.fillStyle = color;
     this.ctx.fill();
@@ -149,11 +150,11 @@ fillTetragon(coord1, coord2, coord3, coord4, color){
     var texture = new Image();
     texture.src = 'woodTexture.jpg';
 
-    var tan = (coord1[1] - coord2[1]) / (coord1[0] - coord2[0]);
-    var size = Math.abs(coord1[0] - coord2[0]);
-    
-    this.ctx.setTransform(1, tan, 0, 1, 0, 0);
-    this.ctx.drawImage(texture, coord1[0] + this.offset[0], coord1[1] + this.offset[1], size, size);
+    var tan = (coord3[1] - coord1[1]) / (coord3[0] - coord1[0]);
+    var size = Math.abs(coord3[0] - coord1[0]);
+
+    //this.ctx.setTransform(1, tan, 0, 1, 0, 0);
+    this.ctx.drawImage(texture, coord4[0] + this.offset[0], coord4[1] + this.offset[1], size, size);
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
 
   }
@@ -270,6 +271,18 @@ projectCube(cube, camera, graphics){
     }
 }
 
+getTetragonPoints(points, side){
+
+    var tetragon_points = []; //RU -> RD -> LU -> LD
+    for(let i=0; i<4; ++i){ tetragon_points.push(points[side[i]]); }
+
+    var sortFunc = (a,b) => {
+      if(a[0] == b[0]){ return b[1] - a[1]; }
+      else{  return b[0] - a[0]; }
+    }
+    return tetragon_points.sort(sortFunc);
+
+}
 
 colorCubeFromSides(graphics, points, sides_indices){
   var col_index = 0;
@@ -277,8 +290,8 @@ colorCubeFromSides(graphics, points, sides_indices){
   //console.log(sides_indices);
   for(var side of sides_indices){
 
-    var tetragon_points = [];
-    for(let i=0; i<4; ++i){ tetragon_points.push(points[side[i]]); }
+    var tetragon_points = this.getTetragonPoints(points, side);
+    //for(let i=0; i<4; ++i){ tetragon_points.push(points[side[i]]); }
 
     //tetragon_points = graphics.rearangeTetragonCoords(tetragon_points);
     graphics.fillTetragon(tetragon_points[0], tetragon_points[1], tetragon_points[2], tetragon_points[3], colors[col_index]);
