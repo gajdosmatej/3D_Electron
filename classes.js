@@ -150,11 +150,30 @@ fillTetragon(coord1, coord2, coord3, coord4, color){
     var texture = new Image();
     texture.src = 'woodTexture.jpg';
 
-    var tan = (coord3[1] - coord1[1]) / (coord3[0] - coord1[0]);
+    var tan_down = (coord3[1] - coord1[1]) / (coord3[0] - coord1[0]);
+    var tan_up = (coord4[1] - coord2[1]) / (coord4[0] - coord2[0]);
     var size = Math.abs(coord3[0] - coord1[0]);
+    var size_y = Math.abs(coord1[1] - coord2[1]);
 
     //this.ctx.setTransform(1, tan, 0, 1, 0, 0);
-    this.ctx.drawImage(texture, coord4[0] + this.offset[0], coord4[1] + this.offset[1], size, size);
+    var n_clips = 50;
+    var funcUp = (x) => {  return tan_up*x - tan_up*coord4[0] + coord4[1];  };
+    var funcDown = (x) => {  return tan_down*x - tan_down*coord4[0] + coord4[1];  };
+    var funcImgUp = (x) => { return tan_up*x;  }
+    var funcImgDown = (x) =>{return tan_down*x + size_y;  }
+    for(let i = 0; i < n_clips; ++i){
+
+      var start_x = i/n_clips * size;
+      var start_y = funcImgUp(start_x);
+      var x = coord3[0] + i/n_clips * size;
+      var y = funcUp(x);
+      var w_x = 1/n_clips * size;
+      var w_y = Math.abs(funcImgDown(start_x) - funcImgUp(start_x));
+      this.ctx.drawImage(texture, start_x, start_y, w_x, w_y, x + this.offset[0], y + this.offset[1], w_x, w_y);
+
+    }
+
+    //this.ctx.drawImage(texture, coord4[0] + this.offset[0], coord4[1] + this.offset[1], size, size);
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
 
   }
