@@ -137,7 +137,7 @@ drawPoint(x,y){
 
 //RU -> RD -> LU -> LD ale U a D zamenene (y roste dolu)
 fillTetragon(coord1, coord2, coord3, coord4, color){
-
+/*
     this.ctx.beginPath();
     this.ctx.moveTo(coord1[0] + this.offset[0], coord1[1] + this.offset[1]);
     this.ctx.lineTo(coord2[0] + this.offset[0], coord2[1] + this.offset[1]);
@@ -145,22 +145,22 @@ fillTetragon(coord1, coord2, coord3, coord4, color){
     this.ctx.lineTo(coord3[0] + this.offset[0], coord3[1] + this.offset[1]);
     this.ctx.closePath();
     this.ctx.fillStyle = color;
-    this.ctx.fill();
+    this.ctx.fill();*/
 
     var texture = new Image();
     texture.src = 'woodTexture.jpg';
-
-    var tan_down = (coord3[1] - coord1[1]) / (coord3[0] - coord1[0]);
-    var tan_up = (coord4[1] - coord2[1]) / (coord4[0] - coord2[0]);
+/*
+    var tan = (coord3[1] - coord1[1]) / (coord3[0] - coord1[0]);
+    //var tan_up = (coord4[1] - coord2[1]) / (coord4[0] - coord2[0]);
     var size = Math.abs(coord3[0] - coord1[0]);
     var size_y = Math.abs(coord1[1] - coord2[1]);
 
     //this.ctx.setTransform(1, tan, 0, 1, 0, 0);
     var n_clips = 50;
-    var funcUp = (x) => {  return tan_up*x - tan_up*coord4[0] + coord4[1];  };
-    var funcDown = (x) => {  return tan_down*x - tan_down*coord4[0] + coord4[1];  };
-    var funcImgUp = (x) => { return tan_up*x;  }
-    var funcImgDown = (x) =>{return tan_down*x + size_y;  }
+    var funcUp = (x) => {  return -tan*x + tan*coord4[0] + coord4[1];  };
+    var funcDown = (x) => {  return tan*x - tan*coord4[0] + coord4[1];  };
+    var funcImgUp = (x) => { return tan*x;  }
+    var funcImgDown = (x) =>{return tan*x + size_y;  }
     for(let i = 0; i < n_clips; ++i){
 
       var start_x = i/n_clips * size;
@@ -169,12 +169,34 @@ fillTetragon(coord1, coord2, coord3, coord4, color){
       var y = funcUp(x);
       var w_x = 1/n_clips * size;
       var w_y = Math.abs(funcImgDown(start_x) - funcImgUp(start_x));
-      this.ctx.drawImage(texture, start_x, start_y, w_x, w_y, x + this.offset[0], y + this.offset[1], w_x, w_y);
+      this.ctx.drawImage(texture, start_x, start_y, w_x, w_y, x + this.offset[0], y + this.offset[1], w_x, w_y); */
 
-    }
+      var L0 = 236;
+      var Lx = Math.abs(coord3[0] - coord1[0]);
+      var Ly = Math.abs(coord4[1] - coord3[1]);
+      var n_clips = 70;
+      var dx0 = L0 / n_clips;
+      var dx = Lx / n_clips;
+      var tg0 = (coord3[1] - coord1[1]) / L0;   //budou znamenka jmenovatelu ok?
+      var tg = (coord3[1] - coord1[1]) / (coord3[0] - coord1[0]);
+
+      for(let i = 0; i < n_clips; ++i){
+
+          var x0 = i*dx0;
+          var w0 = dx0;
+          var y0 = x0 * tg0;
+          var h0 = L0 - 2*y0;
+          var x = i*dx;
+          var w = dx;
+          var y = -x*tg;
+          var h = Ly - 2*y; //console.log(h);
+
+          this.ctx.drawImage(texture, x0, y0, w0, h0, coord4[0] + x + this.offset[0], y + coord4[1] + this.offset[1], w, h);
+      }
+
 
     //this.ctx.drawImage(texture, coord4[0] + this.offset[0], coord4[1] + this.offset[1], size, size);
-    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    //this.ctx.setTransform(1, 0, 0, 1, 0, 0);
 
   }
 
