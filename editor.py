@@ -3,6 +3,7 @@ import tkinter.filedialog
 import math
 import numpy
 import json
+import os
 
 class Brick:
     x = None
@@ -180,6 +181,9 @@ def export():
     f.close()
 
 
+def getTextureNames():
+    return map(lambda str: str[0:-4], os.listdir("textures"))
+
 labelTitle = tkinter.Label(top, text="Editor", font="Times 20")
 labelTitle.pack(side=tkinter.TOP)
 #top.attributes('-zoomed', True)
@@ -196,6 +200,12 @@ radioDelete.pack()
 radioDelete = tkinter.Radiobutton(top, text="Camera", variable=radioVar, value=3)
 radioDelete.pack()
 radioVar.set(0)
+
+textureNames = getTextureNames()
+textureStr = tkinter.StringVar()
+textureStr.set("Wood")
+optionMenu = tkinter.OptionMenu(top, textureStr, *textureNames)
+optionMenu.pack()
 
 canvas = MyCanvas(top, 600, 400)
 
