@@ -177,7 +177,7 @@ fillTetragon(coord1, coord2, coord3, coord4, color){
       var n_clips = 70;
       var dx0 = L0 / n_clips;
       var dx = Lx / n_clips;
-      var tg0 = (coord3[1] - coord1[1]) / L0;   //budou znamenka jmenovatelu ok?
+      var tg0 = Math.abs(coord3[1] - coord1[1]) / L0;   //budou znamenka jmenovatelu ok?
       var tg = (coord3[1] - coord1[1]) / (coord3[0] - coord1[0]);
 
       for(let i = 0; i < n_clips; ++i){
