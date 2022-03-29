@@ -148,7 +148,7 @@ fillTetragon(coord1, coord2, coord3, coord4, color){
     this.ctx.fill();*/
 
     var texture = new Image();
-    texture.src = 'woodTexture.jpg';
+    texture.src = 'textures/brick.jpg';
 /*
     var tan = (coord3[1] - coord1[1]) / (coord3[0] - coord1[0]);
     //var tan_up = (coord4[1] - coord2[1]) / (coord4[0] - coord2[0]);
@@ -171,10 +171,10 @@ fillTetragon(coord1, coord2, coord3, coord4, color){
       var w_y = Math.abs(funcImgDown(start_x) - funcImgUp(start_x));
       this.ctx.drawImage(texture, start_x, start_y, w_x, w_y, x + this.offset[0], y + this.offset[1], w_x, w_y); */
 
-      var L0 = 236;
+      var L0 = 200;
       var Lx = Math.abs(coord3[0] - coord1[0]);
       var Ly = Math.abs(coord4[1] - coord3[1]);
-      var n_clips = 70;
+      var n_clips = 20;
       var dx0 = L0 / n_clips;
       var dx = Lx / n_clips;
       var tg0 = Math.abs(coord3[1] - coord1[1]) / L0;   //budou znamenka jmenovatelu ok?
@@ -184,14 +184,16 @@ fillTetragon(coord1, coord2, coord3, coord4, color){
 
           var x0 = i*dx0;
           var w0 = dx0;
-          var y0 = x0 * tg0;
-          var h0 = L0 - 2*y0;
+          //var y0 = x0 * tg0;
+          var y0 = 0;
+          var h0 = L0;
+          //var h0 = L0 - 2*y0;
           var x = i*dx;
           var w = dx;
           var y = -x*tg;
           var h = Ly - 2*y; //console.log(h);
 
-          this.ctx.drawImage(texture, x0, y0, w0, h0, coord4[0] + x + this.offset[0], y + coord4[1] + this.offset[1], w, h);
+          this.ctx.drawImage(texture, x0, y0, w0, h0, coord4[0] + x + this.offset[0] + 1, y + coord4[1] + this.offset[1], w, h);
       }
 
 
@@ -203,6 +205,7 @@ fillTetragon(coord1, coord2, coord3, coord4, color){
 drawLine(coord_1, coord_2){
 
     this.ctx.beginPath();
+    this.ctx.lineWidth = 10;
     this.ctx.moveTo(coord_1[0] + this.offset[0], coord_1[1] + this.offset[1]);
     this.ctx.lineTo(coord_2[0] + this.offset[0], coord_2[1] + this.offset[1]);  //index 2 docasne
     this.ctx.stroke();
