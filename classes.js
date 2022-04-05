@@ -17,7 +17,6 @@ constructor(x, y, z, len, texturePath, phi=0) {
     this.position_vector = new Vector(x,y,z);
   }
 
-
 *getVerticesCoordinates(){
 
       var cos_phi = Math.cos(this.phi);
@@ -60,7 +59,6 @@ getSidesFromVertex(vertex_indices){
     return selected_sides;
 }
 
-
 getSidePointsFromPosition(camera_vector){
     var relative_vector = new Vector(this.x, this.y, this.z).add(camera_vector.opposite());
     var points = this.getVerticesList();
@@ -88,7 +86,6 @@ getSidePointsFromPosition(camera_vector){
     return [point1, point2];
 }
 
-
 getSideNormalVector(camera_vector){
     var side_points = this.getSidePointsFromPosition(camera_vector);
 
@@ -105,7 +102,11 @@ getSideNormalVector(camera_vector){
 }
 }
 
+class Door extends Cube{
 
+focus=false;
+
+}
 
 class GraphicsControl{
 
@@ -138,7 +139,7 @@ drawPoint(x,y){
   }
 
 //RU -> RD -> LU -> LD ale U a D zamenene (y roste dolu)
-fillTetragon(coord1, coord2, coord3, coord4, color, texturePath){
+fillTetragon(coord1, coord2, coord3, coord4, color, texturePath, alpha){
 /*
     this.ctx.beginPath();
     this.ctx.moveTo(coord1[0] + this.offset[0], coord1[1] + this.offset[1]);
@@ -182,6 +183,7 @@ fillTetragon(coord1, coord2, coord3, coord4, color, texturePath){
       var tg0 = Math.abs(coord3[1] - coord1[1]) / L0;   //budou znamenka jmenovatelu ok?
       var tg = (coord3[1] - coord1[1]) / (coord3[0] - coord1[0]);
 
+      this.ctx.globalAlpha = alpha;
       for(let i = 0; i < n_clips; ++i){
 
           var x0 = i*dx0;
@@ -197,7 +199,7 @@ fillTetragon(coord1, coord2, coord3, coord4, color, texturePath){
 
           this.ctx.drawImage(texture, x0, y0, w0, h0, coord4[0] + x + this.offset[0] + 1, y + coord4[1] + this.offset[1], w, h);
       }
-
+      this.ctx.globalAlpha = 1;
 
     //this.ctx.drawImage(texture, coord4[0] + this.offset[0], coord4[1] + this.offset[1], size, size);
     //this.ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -306,14 +308,22 @@ projectCube(cube, camera, graphics){
 
         }
 
-        for(let i = 0; i < points.length; ++i){
+        /*for(let i = 0; i < points.length; ++i){
           for(let j = i+1; j < points.length; ++j){
               graphics.drawLine(points[i], points[j]);
           }
+      }*/
+
+        for(var v of [[0,1], [0,2], [1,3], [2,3], [0,4], [1,5], [2,6], [3,7], [4,5], [5,7], [6,7], [4,6]]){
+            graphics.drawLine(points[v[0]], points[v[1]]);
         }
 
+        var alpha = 1;
+        if(cube.constructor.name == "Door"){
+            if(cube.focus){ alpha = 0.9;    }
+        }
         var sides_indices = cube.getSidesFromVertex(nearest_indices);
-        this.colorCubeFromSides(graphics, points, sides_indices, cube.texturePath);
+        this.colorCubeFromSides(graphics, points, sides_indices, cube.texturePath, alpha);
     }
 }
 
@@ -330,7 +340,7 @@ getTetragonPoints(points, side){
 
 }
 
-colorCubeFromSides(graphics, points, sides_indices, texturePath){
+colorCubeFromSides(graphics, points, sides_indices, texturePath, alpha){
   var col_index = 0;
   var colors = ["#800", "#080", "#008"];
   //console.log(sides_indices);
@@ -340,7 +350,7 @@ colorCubeFromSides(graphics, points, sides_indices, texturePath){
     //for(let i=0; i<4; ++i){ tetragon_points.push(points[side[i]]); }
 
     //tetragon_points = graphics.rearangeTetragonCoords(tetragon_points);
-    graphics.fillTetragon(tetragon_points[0], tetragon_points[1], tetragon_points[2], tetragon_points[3], colors[col_index], texturePath);
+    graphics.fillTetragon(tetragon_points[0], tetragon_points[1], tetragon_points[2], tetragon_points[3], colors[col_index], texturePath, alpha);
     //console.log(colors[col_index]);
     col_index += 1;
   }
@@ -354,6 +364,20 @@ y = 0;
 z = 0;
 phi = 0*Math.PI;
 field_of_view = 0.8*Math.PI/6;
+
+isDoorNearby(door){
+
+    var delta_x = door.x - this.x;
+    var delta_z = door.z - this.z;
+    var delta_phi = Math.abs( Math.tan(this.phi) - delta_z / delta_x);
+    var R = Math.sqrt(delta_x * delta_x + delta_z * delta_z);
+    //console.log(door.texturePath);
+    if(R < 300 && delta_phi < 0.1 && Math.sign(Math.cos(this.phi)) == Math.sign(delta_z) ){
+        return true;
+    }
+    return false;
+}
+
 
 move(delta_x,delta_y,delta_z, cubes){
 
@@ -426,6 +450,7 @@ isCubeInFieldOfView(cube){
       return false;
   }
 }
+
 
 function Debug(info){
     var DEBUG_LAYER = 1;    //-1 ... zadny debug, 0 ... zakladni debug, 1 ... rozsireny debug

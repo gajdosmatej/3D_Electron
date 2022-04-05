@@ -18,8 +18,13 @@
 
   echo "var objects = [";
 
-  for ($i = 1; $i < count($list); $i++) {
-    echo "new Cube(";
+for ($i = 1; $i < count($list); $i++) {
+    if($list[$i]["texture"] == "textures/door.jpg"){
+        echo "new Door(";
+    }
+    else{
+        echo "new Cube(";
+    }
     echo strval($list[$i]["x"]);
     echo ", 0, ";
     echo strval($list[$i]["y"]);
@@ -28,16 +33,22 @@
     echo ", '";
     echo strval($list[$i]["texture"]);
     echo "', 0), ";
-  }
-  echo "new Cube(";
-  echo strval($list[0]["x"]);
-  echo ", 0, ";
-  echo strval($list[0]["y"]);
-  echo ", ";
-  echo strval($list[0]["size"]);
-  echo ", '";
-  echo strval($list[0]["texture"]);
-  echo "', 0)];";
+}
+
+if($list[0]["texture"] == "textures/door.jpg"){
+    echo "new Door(";
+}
+else{
+    echo "new Cube(";
+}
+echo strval($list[0]["x"]);
+echo ", 0, ";
+echo strval($list[0]["y"]);
+echo ", ";
+echo strval($list[0]["size"]);
+echo ", '";
+echo strval($list[0]["texture"]);
+echo "', 0)];";
 
    ?>
   var graphics;
@@ -62,11 +73,25 @@
 
   }
 
+  var focus_door = null;
+
   function project(){
 
-    for(obj of objects){  plane.projectCube(obj, camera, graphics); }
+    for(obj of objects){
 
+        if(focus_door != null){ focus_door.focus = false;   }
+        focus_door = null;
+        //if(obj.texturePath == "textures/door.jpg"){
+        if(obj.constructor.name == "Door"){
+            if(camera.isDoorNearby(obj)){
+                obj.focus = true;
+                focus_door = obj;
+            }
+        }
+        plane.projectCube(obj, camera, graphics);
+    }
   }
+
 
   function redraw(){
     graphics.clear();
