@@ -12,10 +12,12 @@ class Brick:
     colour = None
     tk_handler = None
     canvas = None
+    textureStr = None
 
-    def __init__(self, x, y, size, my_canvas, colour):
+    def __init__(self, x, y, size, my_canvas, colour, textureStr):
         self.x = x
         self.y = y
+        self.textureStr = textureStr
         self.size = size
         self.canvas = my_canvas
         self.draw(colour)
@@ -27,7 +29,7 @@ class Brick:
         self.canvas.canvas.delete(self.tk_handler)
 
     def toExport(self, myCanvas):
-        return {"x": self.x - myCanvas.cameraX, "y": self.y - myCanvas.cameraY, "size": self.size}
+        return {"x": self.x - myCanvas.cameraX, "y": self.y - myCanvas.cameraY, "size": self.size, "texture": "textures/" + self.textureStr + ".jpg"}
 
 
 class MyCanvas:
@@ -66,7 +68,7 @@ class MyCanvas:
             del self.mouse_brick
 
         vertex = self.getVertexFromMouse(event)
-        self.mouse_brick = Brick(vertex[0], vertex[1], self.grid_step, self, "#AAAAAA")
+        self.mouse_brick = Brick(vertex[0], vertex[1], self.grid_step, self, "#AAAAAA", "NULL")
         return
 
 
@@ -151,7 +153,7 @@ class MyCanvas:
 
         if radioVar.get() == 1:
             if self.matrix[column, row] == None:    #muze v budoucnu delat problem - pri presunu kamery se starym cihlam nezmeni souradnice
-                self.matrix[column, row] = Brick(vertex[0], vertex[1], self.grid_step, self, "#00AA00")
+                self.matrix[column, row] = Brick(vertex[0], vertex[1], self.grid_step, self, "#00AA00", textureStr.get())
 
         elif radioVar.get() == 2:
             if self.matrix[column, row] != None:

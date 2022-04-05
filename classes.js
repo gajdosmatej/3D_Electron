@@ -5,12 +5,14 @@ class Cube{
   position_vector;
   side_len;
   phi;
+  texturePath;
 
-constructor(x, y, z, len, phi=0) {
+constructor(x, y, z, len, texturePath, phi=0) {
     this.x = x;
     this.y = y;
     this.z = z;
     this.side_len = len;
+    this.texturePath = texturePath;
     this.phi = phi;
     this.position_vector = new Vector(x,y,z);
   }
@@ -136,7 +138,7 @@ drawPoint(x,y){
   }
 
 //RU -> RD -> LU -> LD ale U a D zamenene (y roste dolu)
-fillTetragon(coord1, coord2, coord3, coord4, color){
+fillTetragon(coord1, coord2, coord3, coord4, color, texturePath){
 /*
     this.ctx.beginPath();
     this.ctx.moveTo(coord1[0] + this.offset[0], coord1[1] + this.offset[1]);
@@ -148,7 +150,7 @@ fillTetragon(coord1, coord2, coord3, coord4, color){
     this.ctx.fill();*/
 
     var texture = new Image();
-    texture.src = 'textures/brick.jpg';
+    texture.src = texturePath;
 /*
     var tan = (coord3[1] - coord1[1]) / (coord3[0] - coord1[0]);
     //var tan_up = (coord4[1] - coord2[1]) / (coord4[0] - coord2[0]);
@@ -311,7 +313,7 @@ projectCube(cube, camera, graphics){
         }
 
         var sides_indices = cube.getSidesFromVertex(nearest_indices);
-        this.colorCubeFromSides(graphics, points, sides_indices);
+        this.colorCubeFromSides(graphics, points, sides_indices, cube.texturePath);
     }
 }
 
@@ -328,7 +330,7 @@ getTetragonPoints(points, side){
 
 }
 
-colorCubeFromSides(graphics, points, sides_indices){
+colorCubeFromSides(graphics, points, sides_indices, texturePath){
   var col_index = 0;
   var colors = ["#800", "#080", "#008"];
   //console.log(sides_indices);
@@ -338,7 +340,7 @@ colorCubeFromSides(graphics, points, sides_indices){
     //for(let i=0; i<4; ++i){ tetragon_points.push(points[side[i]]); }
 
     //tetragon_points = graphics.rearangeTetragonCoords(tetragon_points);
-    graphics.fillTetragon(tetragon_points[0], tetragon_points[1], tetragon_points[2], tetragon_points[3], colors[col_index]);
+    graphics.fillTetragon(tetragon_points[0], tetragon_points[1], tetragon_points[2], tetragon_points[3], colors[col_index], texturePath);
     //console.log(colors[col_index]);
     col_index += 1;
   }

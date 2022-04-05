@@ -25,7 +25,9 @@
     echo strval($list[$i]["y"]);
     echo ", ";
     echo strval($list[$i]["size"]);
-    echo ", 0), ";
+    echo ", '";
+    echo strval($list[$i]["texture"]);
+    echo "', 0), ";
   }
   echo "new Cube(";
   echo strval($list[0]["x"]);
@@ -33,7 +35,9 @@
   echo strval($list[0]["y"]);
   echo ", ";
   echo strval($list[0]["size"]);
-  echo ", 0)];";
+  echo ", '";
+  echo strval($list[0]["texture"]);
+  echo "', 0)];";
 
    ?>
   var graphics;
