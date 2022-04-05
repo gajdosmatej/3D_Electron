@@ -103,9 +103,17 @@ getSideNormalVector(camera_vector){
 }
 
 class Door extends Cube{
+    focus = false;
+    opened = false;
 
-focus=false;
-
+    changeState(){
+        if(this.opened){
+            this.opened = false;
+        }
+        else{
+            this.opened = true;
+        }
+    }
 }
 
 class GraphicsControl{
@@ -323,7 +331,10 @@ projectCube(cube, camera, graphics){
             if(cube.focus){ alpha = 0.9;    }
         }
         var sides_indices = cube.getSidesFromVertex(nearest_indices);
-        this.colorCubeFromSides(graphics, points, sides_indices, cube.texturePath, alpha);
+        if(cube.constructor.name == "Door" && cube.opened){}
+        else{
+            this.colorCubeFromSides(graphics, points, sides_indices, cube.texturePath, alpha);
+        }
     }
 }
 

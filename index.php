@@ -77,10 +77,11 @@ echo "', 0)];";
 
   function project(){
 
+    if(focus_door != null){ focus_door.focus = false;   }
+    focus_door = null;
+
     for(obj of objects){
 
-        if(focus_door != null){ focus_door.focus = false;   }
-        focus_door = null;
         //if(obj.texturePath == "textures/door.jpg"){
         if(obj.constructor.name == "Door"){
             if(camera.isDoorNearby(obj)){
@@ -115,6 +116,7 @@ echo "', 0)];";
 
       else if(key == 'q'){   index = 4;   }
       else if(key == 'e'){   index = 5;   }
+      else if(key == 'r'){  index = 6;  }
       else{ index = -1; }
 
       return index;
@@ -125,7 +127,10 @@ echo "', 0)];";
       var key = ev.key;
       var index = getIndexFromKey(key);
 
-      if(index != -1){
+      if(index == 6){
+          actionButtonClicked();
+      }
+      else if(index != -1){
           if(!pressed_directions[index]){
               pressed_directions[index] = true;
 
@@ -133,6 +138,13 @@ echo "', 0)];";
                   timers[index] = setInterval(function(){move(index);}, 1000 / MOVE_FPS);
               }
           }
+      }
+  }
+
+  function actionButtonClicked(){
+      if(focus_door != null){
+          focus_door.changeState();
+          redraw();
       }
   }
 
