@@ -53,6 +53,7 @@ echo "', 0)];";
    ?>
   var graphics;
   var plane;
+  var level;
 
   function load(){
 
@@ -69,6 +70,7 @@ echo "', 0)];";
 
     //objects.push(new Cube(400,0,30,20, Math.PI / 1));
     objects = Mathematics.sortRenderQueue(objects, camera);
+    level = new Level(objects);
     project();
 
   }

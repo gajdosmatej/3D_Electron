@@ -1,3 +1,38 @@
+class Level{
+    array;
+
+    constructor(object_list){
+        var xs = object_list.map(cube => cube.x);
+        var zs = object_list.map(cube => cube.z);
+
+        var min_x_index = Mathematics.getSmallestValueIndex(xs);
+        var max_x_index = Mathematics.getSmallestValueIndex(xs.map(obj => -obj));
+        var min_z_index = Mathematics.getSmallestValueIndex(zs);
+        var max_z_index = Mathematics.getSmallestValueIndex(zs.map(obj => -obj));
+
+        var min_x = object_list[min_x_index].x;
+        var min_z = object_list[min_z_index].z;
+        var max_x = object_list[max_x_index].x;
+        var max_z = object_list[max_z_index].z;
+
+        var L = object_list[0].side_len;
+
+        var size_row = (max_z - min_z) / L;
+        var size_col = (max_x - min_x) / L;
+
+        this.array = Array(size_row+1).fill(null).map(obj => Array(size_col+1).fill(null));
+
+        for(var cube of object_list){
+            var row = (cube.z - min_z) / L;
+            var column = (cube.x - min_x) / L;
+            this.array[row][column] = cube;
+            cube.map_coord = [row, column];
+        }
+    }
+}
+
+
+
 class Cube{
   x;
   y;
@@ -6,6 +41,7 @@ class Cube{
   side_len;
   phi;
   texturePath;
+  map_coord;
 
 constructor(x, y, z, len, texturePath, phi=0) {
     this.x = x;
