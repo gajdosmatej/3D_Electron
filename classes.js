@@ -1,5 +1,7 @@
 class Level{
     array;
+    rows;
+    columns;
 
     constructor(object_list){
         var xs = object_list.map(cube => cube.x);
@@ -20,6 +22,9 @@ class Level{
         var size_row = (max_z - min_z) / L;
         var size_col = (max_x - min_x) / L;
 
+        this.rows = size_row + 1;
+        this.columns = size_col + 1;
+
         this.array = Array(size_row+1).fill(null).map(obj => Array(size_col+1).fill(null));
 
         for(var cube of object_list){
@@ -28,6 +33,24 @@ class Level{
             this.array[row][column] = cube;
             cube.map_coord = [row, column];
         }
+    }
+
+    getNeighbours(coord){
+
+        var row = coord[0];
+        var col = coord[1];
+
+        var neigh = [];
+        if(row == 0){   neigh[0] = null;    }   else{   neigh[0] = this.array[row-1][col];  }
+        if(col == 0){   neigh[1] = null;    }   else{   neigh[1] = this.array[row][col-1];  }
+        if(row == this.rows-1){ neigh[2] = null;    }   else{   neigh[2] = this.array[row+1][col];  }
+        if(col == this.columns-1){  neigh[3] = null;    }   else{   neigh[3] = this.array[row][col+1];  }
+        return neigh;
+
+    }
+
+    get(coord){
+        return array[coord[0]][coord[1]];
     }
 }
 

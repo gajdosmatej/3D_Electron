@@ -57,6 +57,7 @@ echo "', 0)];";
 
   function load(){
 
+    level = new Level(objects);
     document.getElementById("fps").innerHTML = "FPS: " + String(MOVE_FPS);
     var can = document.getElementById("cnv");
     can.width = 0.96*window.innerWidth;
@@ -70,7 +71,6 @@ echo "', 0)];";
 
     //objects.push(new Cube(400,0,30,20, Math.PI / 1));
     objects = Mathematics.sortRenderQueue(objects, camera);
-    level = new Level(objects);
     project();
 
   }
@@ -146,11 +146,12 @@ echo "', 0)];";
   var door_interval = null;
   var door_iter = 0;
   var opening_door = null;
+  var door_isX = false;
 
   function doorAnimation(){
 
-      if(opening_door.opened){    opening_door.z += 10; }
-      else{ opening_door.z -= 10; }
+      if(opening_door.opened){    if(door_isX){ opening_door.x += 10;}else{ opening_door.z += 10;   } }
+      else{ if(door_isX){   opening_door.x -= 10;}  else{   opening_door.z -= 10;   } }
 
       door_iter += 1;
       if(door_iter == 5){
@@ -166,6 +167,10 @@ echo "', 0)];";
       if(focus_door != null){
           focus_door.changeState();
           opening_door = focus_door;
+          var map_coord = opening_door.map_coord;
+          var neigh = level.getNeighbours(map_coord);
+          if(neigh[0] == null && neigh[2] == null){    door_isX = true;    }else{  door_isX = false;   }
+
           door_interval = setInterval(doorAnimation, 100);
           //redraw();
       }
