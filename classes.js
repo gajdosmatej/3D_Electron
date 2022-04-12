@@ -331,10 +331,10 @@ projectCube(cube, camera, graphics){
             if(cube.focus){ alpha = 0.9;    }
         }
         var sides_indices = cube.getSidesFromVertex(nearest_indices);
-        if(cube.constructor.name == "Door" && cube.opened){}
-        else{
+        //if(cube.constructor.name == "Door" && cube.opened){}
+        //else{
             this.colorCubeFromSides(graphics, points, sides_indices, cube.texturePath, alpha);
-        }
+        //}
     }
 }
 

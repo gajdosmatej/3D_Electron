@@ -141,10 +141,31 @@ echo "', 0)];";
       }
   }
 
+  var door_interval = null;
+  var door_iter = 0;
+  var opening_door = null;
+
+  function doorAnimation(){
+
+      if(opening_door.opened){    opening_door.z += 10; }
+      else{ opening_door.z -= 10; }
+
+      door_iter += 1;
+      if(door_iter == 5){
+          clearInterval(door_interval);
+          door_iter = 0;
+          opening_door = null;
+      }
+
+      redraw();
+  }
+
   function actionButtonClicked(){
       if(focus_door != null){
           focus_door.changeState();
-          redraw();
+          opening_door = focus_door;
+          door_interval = setInterval(doorAnimation, 100);
+          //redraw();
       }
   }
 
