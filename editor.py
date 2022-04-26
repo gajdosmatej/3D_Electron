@@ -12,13 +12,18 @@ class Character:
     colour = None
     tk_handler = None
     canvas = None
+    path = None
 
     def __init__(self, x, y, size, my_canvas, colour):
         self.x = x
         self.y = y
         self.size = size
         self.canvas = my_canvas
+        self.path = [[self.x, self.y]]
         self.draw(colour)
+
+    def setPath(self, x,y):
+        self.path.append([x,y])
 
     def draw(self, colour):
         self.tk_handler = self.canvas.addRectangle(self.x, self.y, self.size, colour)
@@ -67,6 +72,7 @@ class MyCanvas:
     mouse_brick = None
     row_num = None
     col_num = None
+    activeCharacter = None
 
     #funkcni pro mrizku, kde jsou hlavni uzly
     '''def mouseMotion(self, event):
@@ -91,10 +97,12 @@ class MyCanvas:
     def mouseMotion(self, event):
         if self.mouse_brick != None:
             del self.mouse_brick
-
+            
         vertex = self.getVertexFromMouse(event)
-        self.mouse_brick = Brick(vertex[0], vertex[1], self.grid_step, self, "#AAAAAA", "NULL")
-        return
+        if self.activeCharacter == None:
+            self.mouse_brick = Brick(vertex[0], vertex[1], self.grid_step, self, "#AAAAAA", "NULL")
+        else:
+            self.mouse_brick = Brick(vertex[0], vertex[1], self.grid_step, self, "#0000FF", "NULL")
 
 
     def addRectangle(self, x, y, size, colour):
@@ -191,7 +199,11 @@ class MyCanvas:
         elif radioVar.get() == 4:
             if self.matrix[column, row] == None:
                 self.matrix[column, row] = Character(vertex[0], vertex[1], self.grid_step, self, "#AA0000")
-
+        elif radioVar.get() == 0:
+            if type( self.matrix[column, row] ).__name__ == "Character":
+                self.activeCharacter = self.matrix[column, row]
+            else:
+                self.activeCharacter = None
 
 top = tkinter.Tk()
 top.title("Editor")
