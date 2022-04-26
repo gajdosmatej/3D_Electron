@@ -55,6 +55,110 @@ class Level{
 }
 
 
+class Character{
+    x;
+    y;
+    z;
+    position_vector;
+    side_len;
+    phi;
+    map_coord;
+    texturePath = "textures/character.jpg";
+
+    constructor(x, y, z, len, phi=0) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.side_len = len;
+        this.phi = phi;
+        this.position_vector = new Vector(x,y,z);
+      }
+
+      *getVerticesCoordinates(){
+
+            var cos_phi = Math.cos(this.phi);
+            var sin_phi = Math.sin(this.phi);
+
+            for(let centre_vertex_vector of this.getRelativeVerticesCoordinates()){;
+
+                var rot_Y_matrix = new Tensor(    [[cos_phi, 0, -sin_phi],
+                                                  [0, 1, 0],
+                                                  [sin_phi, 0, cos_phi]] );
+
+                var rot_centre_vertex_vector = rot_Y_matrix.multiply(centre_vertex_vector);
+                var vertex_vector = rot_centre_vertex_vector.add( new Vector(this.x, this.y, this.z) );
+                yield vertex_vector;
+          }
+        }
+
+        getVerticesList(){
+            var list = [];
+            for(let vertex of this.getVerticesCoordinates()){
+                list.push(vertex);
+            }
+            return list;
+        }
+
+      *getRelativeVerticesCoordinates(){
+            for(let x_modifier of [-1, 1]){
+                for(let y_modifier of [-1, 1]){
+                    for(let z_modifier of [-1, 1]){
+
+                      yield new Vector(x_modifier * this.side_len / 2,
+                            y_modifier * this.side_len / 2,
+                            z_modifier * this.side_len / 2);
+            }}}
+        }
+
+      getSidesFromVertex(vertex_indices){
+          var sides = [[0,1,3,2], [4,5,7,6], [0,1,4,5], [2,3,6,7], [0,2,6,4], [1,3,7,5]];
+          var selected_sides = sides.filter(side => vertex_indices.every(i => side.includes(i)));
+          return selected_sides;
+      }
+
+      getSidePointsFromPosition(camera_vector){
+          var relative_vector = new Vector(this.x, this.y, this.z).add(camera_vector.opposite());
+          var points = this.getVerticesList();
+
+          var filterFunc = value => {return value.y > 0;  };
+          var mapFuncZero = value => {value.y = 0; return value;  }
+          //var mapFuncNorm = value => {return value.getNorm(); }
+          function mapFuncNorm(relative_vector) {
+          return function(value){
+              return value.add(camera_vector.opposite()).getNorm();
+          }}
+
+          var points = points.filter(filterFunc).map(mapFuncZero);
+          var point_norms = points.map(mapFuncNorm(camera_vector) );
+          //console.log(point_norms);
+          var point1_index = Mathematics.getSmallestValueIndex(point_norms);
+          var point1 = points[point1_index];
+
+          point_norms.splice(point1_index, 1);
+          points.splice(point1_index, 1);
+
+          var point2_index = Mathematics.getSmallestValueIndex(point_norms);
+          var point2 = points[point2_index];
+
+          return [point1, point2];
+      }
+
+      getSideNormalVector(camera_vector){
+          var side_points = this.getSidePointsFromPosition(camera_vector);
+
+          var normal_vector = new Vector(side_points[1].z - side_points[0].z, 0, side_points[0].x - side_points[1].x);
+          normal_vector = normal_vector.multiply(1 / normal_vector.getNorm());
+
+          var relat_vector = camera_vector.add(new Vector(-this.x, -this.y, -this.z));
+
+          if(relat_vector.getNorm() < relat_vector.add(normal_vector).getNorm()){
+              normal_vector = normal_vector.multiply(-1);
+          }
+
+          return normal_vector;
+      }
+
+}
 
 class Cube{
   x;

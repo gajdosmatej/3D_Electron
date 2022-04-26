@@ -5,6 +5,31 @@ import numpy
 import json
 import os
 
+class Character:
+    x = None
+    y = None
+    size = None
+    colour = None
+    tk_handler = None
+    canvas = None
+
+    def __init__(self, x, y, size, my_canvas, colour):
+        self.x = x
+        self.y = y
+        self.size = size
+        self.canvas = my_canvas
+        self.draw(colour)
+
+    def draw(self, colour):
+        self.tk_handler = self.canvas.addRectangle(self.x, self.y, self.size, colour)
+
+    def __del__(self):
+        self.canvas.canvas.delete(self.tk_handler)
+
+    def toExport(self, myCanvas):
+        return {"x": self.x - myCanvas.cameraX, "y": self.y - myCanvas.cameraY, "size": self.size, "character": True}
+
+
 class Brick:
     x = None
     y = None
@@ -29,7 +54,7 @@ class Brick:
         self.canvas.canvas.delete(self.tk_handler)
 
     def toExport(self, myCanvas):
-        return {"x": self.x - myCanvas.cameraX, "y": self.y - myCanvas.cameraY, "size": self.size, "texture": "textures/" + self.textureStr + ".jpg"}
+        return {"x": self.x - myCanvas.cameraX, "y": self.y - myCanvas.cameraY, "size": self.size, "texture": "textures/" + self.textureStr + ".jpg", "character": False}
 
 
 class MyCanvas:
@@ -163,6 +188,10 @@ class MyCanvas:
         elif radioVar.get() == 3:
             if (self.matrix[column, row] == None) and (not self.isCameraPlaced):
                 self.placeCamera(vertex[0], vertex[1])
+        elif radioVar.get() == 4:
+            if self.matrix[column, row] == None:
+                self.matrix[column, row] = Character(vertex[0], vertex[1], self.grid_step, self, "#AA0000")
+
 
 top = tkinter.Tk()
 top.title("Editor")
@@ -199,8 +228,10 @@ radioPaint = tkinter.Radiobutton(top, text="Paint", variable=radioVar, value=1)
 radioPaint.pack()
 radioDelete = tkinter.Radiobutton(top, text="Delete", variable=radioVar, value=2)
 radioDelete.pack()
-radioDelete = tkinter.Radiobutton(top, text="Camera", variable=radioVar, value=3)
-radioDelete.pack()
+radioCamera = tkinter.Radiobutton(top, text="Camera", variable=radioVar, value=3)
+radioCamera.pack()
+radioCharacter = tkinter.Radiobutton(top, text="Character", variable=radioVar, value=4)
+radioCharacter.pack()
 radioVar.set(0)
 
 textureNames = getTextureNames()

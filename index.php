@@ -19,37 +19,58 @@
   echo "var objects = [";
 
 for ($i = 1; $i < count($list); $i++) {
-    if($list[$i]["texture"] == "textures/door.jpg"){
-        echo "new Door(";
+    if($list[$i]["character"]){
+        echo "new Character(";
+        echo strval($list[$i]["x"]);
+        echo ", 0, ";
+        echo strval($list[$i]["y"]);
+        echo ", ";
+        echo strval($list[$i]["size"]);
+        echo "), ";
     }
     else{
-        echo "new Cube(";
+        if($list[$i]["texture"] == "textures/door.jpg"){
+            echo "new Door(";
+        }
+        else{
+            echo "new Cube(";
+        }
+        echo strval($list[$i]["x"]);
+        echo ", 0, ";
+        echo strval($list[$i]["y"]);
+        echo ", ";
+        echo strval($list[$i]["size"]);
+        echo ", '";
+        echo strval($list[$i]["texture"]);
+        echo "', 0), ";
     }
+}
+
+if($list[$i]["character"]){
+    echo "new Character(";
     echo strval($list[$i]["x"]);
     echo ", 0, ";
     echo strval($list[$i]["y"]);
     echo ", ";
     echo strval($list[$i]["size"]);
-    echo ", '";
-    echo strval($list[$i]["texture"]);
-    echo "', 0), ";
-}
-
-if($list[0]["texture"] == "textures/door.jpg"){
-    echo "new Door(";
+    echo ")";
 }
 else{
-    echo "new Cube(";
+    if($list[0]["texture"] == "textures/door.jpg"){
+        echo "new Door(";
+    }
+    else{
+        echo "new Cube(";
+    }
+    echo strval($list[0]["x"]);
+    echo ", 0, ";
+    echo strval($list[0]["y"]);
+    echo ", ";
+    echo strval($list[0]["size"]);
+    echo ", '";
+    echo strval($list[0]["texture"]);
+    echo "', 0)];";
 }
-echo strval($list[0]["x"]);
-echo ", 0, ";
-echo strval($list[0]["y"]);
-echo ", ";
-echo strval($list[0]["size"]);
-echo ", '";
-echo strval($list[0]["texture"]);
-echo "', 0)];";
-
    ?>
   var graphics;
   var plane;
