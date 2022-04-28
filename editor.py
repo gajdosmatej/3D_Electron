@@ -32,7 +32,7 @@ class Character:
         self.canvas.canvas.delete(self.tk_handler)
 
     def toExport(self, myCanvas):
-        return {"x": self.x - myCanvas.cameraX, "y": self.y - myCanvas.cameraY, "size": self.size, "character": True}
+        return {"x": self.x - myCanvas.cameraX, "y": self.y - myCanvas.cameraY, "size": self.size, "character": True, "path": self.path}
 
 
 class Brick:
@@ -102,7 +102,12 @@ class MyCanvas:
         if self.activeCharacter == None:
             self.mouse_brick = Brick(vertex[0], vertex[1], self.grid_step, self, "#AAAAAA", "NULL")
         else:
-            self.mouse_brick = Brick(vertex[0], vertex[1], self.grid_step, self, "#0000FF", "NULL")
+            coord = self.activeCharacter.path[-1:][0]
+            x0, y0 = coord[0], coord[1]
+            if( numpy.abs(event.x - x0) > numpy.abs(event.y - y0)):
+                self.mouse_brick = Brick(vertex[0], y0, self.grid_step, self, "#9999FF", "NULL")
+            else:
+                self.mouse_brick = Brick(x0, vertex[1], self.grid_step, self, "#9999FF", "NULL")
 
 
     def addRectangle(self, x, y, size, colour):
@@ -199,11 +204,20 @@ class MyCanvas:
         elif radioVar.get() == 4:
             if self.matrix[column, row] == None:
                 self.matrix[column, row] = Character(vertex[0], vertex[1], self.grid_step, self, "#AA0000")
+
         elif radioVar.get() == 0:
-            if type( self.matrix[column, row] ).__name__ == "Character":
-                self.activeCharacter = self.matrix[column, row]
-            else:
-                self.activeCharacter = None
+
+            if self.activeCharacter != None and self.matrix[column, row] == None:
+                self.activeCharacter.path.append([self.mouse_brick.x, self.mouse_brick.y])
+                self.matrix[column, row] = self.mouse_brick
+                self.matrix[column, row].textureStr = "NULL"
+
+            elif type( self.matrix[column, row] ).__name__ == "Character":
+                if self.matrix[column, row] == self.activeCharacter:
+                    self.activeCharacter = None
+                else:
+                    self.activeCharacter = self.matrix[column, row]
+
 
 top = tkinter.Tk()
 top.title("Editor")
@@ -217,7 +231,8 @@ def export():
     for i in range(0, n1):
         for j in range(0, n2):
             if matrix[i][j] != None:
-                obj_list.append(matrix[i][j].toExport(canvas))
+                if type(matrix[i][j]).__name__ == "Character" or matrix[i][j].textureStr != "NULL":
+                    obj_list.append(matrix[i][j].toExport(canvas))
 
     f = open("export.json", "w")
     f.write(json.dumps(obj_list))
