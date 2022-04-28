@@ -46,14 +46,14 @@ for ($i = 1; $i < count($list); $i++) {
     }
 }
 
-if($list[$i]["character"]){
+if($list[0]["character"]){
     echo "new Character(";
-    echo strval($list[$i]["x"]);
+    echo strval($list[0]["x"]);
     echo ", 0, ";
-    echo strval($list[$i]["y"]);
+    echo strval($list[0]["y"]);
     echo ", ";
-    echo strval($list[$i]["size"]);
-    echo ")";
+    echo strval($list[0]["size"]);
+    echo ")];";
 }
 else{
     if($list[0]["texture"] == "textures/door.jpg"){

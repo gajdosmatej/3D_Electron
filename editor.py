@@ -97,7 +97,7 @@ class MyCanvas:
     def mouseMotion(self, event):
         if self.mouse_brick != None:
             del self.mouse_brick
-            
+
         vertex = self.getVertexFromMouse(event)
         if self.activeCharacter == None:
             self.mouse_brick = Brick(vertex[0], vertex[1], self.grid_step, self, "#AAAAAA", "NULL")
