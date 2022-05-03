@@ -16,6 +16,7 @@
   $import_json = file_get_contents("export.json");
   $list = json_decode($import_json, true);
 
+
   echo "var objects = [";
 
 for ($i = 1; $i < count($list); $i++) {
@@ -26,6 +27,23 @@ for ($i = 1; $i < count($list); $i++) {
         echo strval($list[$i]["y"]);
         echo ", ";
         echo strval($list[$i]["size"]);
+        echo ", ";
+
+        echo "[";
+        $path_len = count($list[$i]["path"]);
+        for($j = 0; $j < $path_len-1; $j++){
+            echo "[";
+            echo strval($list[$i]["path"][$j][0]);
+            echo ", ";
+            echo strval($list[$i]["path"][$j][1]);
+            echo "], ";
+        }
+        echo "[";
+        echo strval($list[$i]["path"][$path_len-1][0]);
+        echo ", ";
+        echo strval($list[$i]["path"][$path_len-1][1]);
+        echo "]";
+        echo "]";
         echo "), ";
     }
     else{
@@ -53,6 +71,23 @@ if($list[0]["character"]){
     echo strval($list[0]["y"]);
     echo ", ";
     echo strval($list[0]["size"]);
+    echo ", ";
+
+    echo "[";
+    $path_len = count($list[0]["path"]);
+    for($j = 0; $j < $path_len-1; $j++){
+        echo "[";
+        echo strval($list[0]["path"][$j][0]);
+        echo ", ";
+        echo strval($list[0]["path"][$j][1]);
+        echo "], ";
+    }
+    echo "[";
+    echo strval($list[0]["path"][$path_len-1][0]);
+    echo ", ";
+    echo strval($list[0]["path"][$path_len-1][1]);
+    echo "]";
+    echo "]";
     echo ")];";
 }
 else{

@@ -64,11 +64,13 @@ class Character{
     phi;
     map_coord;
     texturePath = "textures/character.jpg";
+    path;
 
-    constructor(x, y, z, len, phi=0) {
+    constructor(x, y, z, len, path, phi=0) {
         this.x = x;
         this.y = y;
         this.z = z;
+        this.path = path;
         this.side_len = len;
         this.phi = phi;
         this.position_vector = new Vector(x,y,z);
