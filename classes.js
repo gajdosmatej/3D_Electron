@@ -65,6 +65,10 @@ class Character{
     map_coord;
     texturePath = "textures/character.jpg";
     path;
+    timer;
+    direction = [0,1];
+    direction_increment = 1;
+    velocity = 5;
 
     constructor(x, y, z, len, path, phi=0) {
         this.x = x;
@@ -74,6 +78,34 @@ class Character{
         this.side_len = len;
         this.phi = phi;
         this.position_vector = new Vector(x,y,z);
+        this.timer = setInterval(this.move.bind(this), 100);
+      }
+
+      move(){
+          var i = this.direction[0];
+          var j = this.direction[1];
+          var direction_vector = new Vector(this.path[j][0] - this.path[i][0], 0, this.path[j][1] - this.path[i][1]);
+          direction_vector = direction_vector.multiply(this.velocity / direction_vector.getNorm());
+
+          this.position_vector = this.position_vector.add(direction_vector);
+          this.x = this.position_vector.x;
+          this.z = this.position_vector.z;
+          console.log(this.direction);
+          console.log(this.path.length);
+          if(this.x == this.path[j][0] && this.z == this.path[j][1]){
+
+                if(this.path.length == this.direction[1] + 1){
+                    this.direction_increment = -1;
+                    this.direction.reverse();
+                }else if(this.direction[1] == 0){
+                    this.direction_increment = 1;
+                    this.direction.reverse();
+                }else{
+                    this.direction[0] += this.direction_increment;
+                    this.direction[1] += this.direction_increment;
+                }
+            }
+          redraw();
       }
 
       *getVerticesCoordinates(){
