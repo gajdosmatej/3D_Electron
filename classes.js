@@ -63,7 +63,7 @@ class Character{
     side_len;
     phi;
     map_coord;
-    texturePath = "textures/character.jpg";
+    texturePath = "textures/character.png";
     path;
     timer;
     direction = [0,1];
@@ -90,8 +90,7 @@ class Character{
           this.position_vector = this.position_vector.add(direction_vector);
           this.x = this.position_vector.x;
           this.z = this.position_vector.z;
-          console.log(this.direction);
-          console.log(this.path.length);
+
           if(this.x == this.path[j][0] && this.z == this.path[j][1]){
 
                 if(this.path.length == this.direction[1] + 1){
@@ -343,6 +342,14 @@ drawPoint(x,y){
 
   }
 
+
+paintCharacter(coord, character){
+    var texture = new Image();
+    texture.src = character.texturePath;
+    console.log(coord);
+    this.ctx.drawImage(texture, coord[0] + this.offset[0], coord[1] + this.offset[1], character.side_len, character.side_len);
+}
+
 //RU -> RD -> LU -> LD ale U a D zamenene (y roste dolu)
 fillTetragon(coord1, coord2, coord3, coord4, color, texturePath, alpha){
 /*
@@ -528,8 +535,10 @@ projectCube(cube, camera, graphics){
             if(cube.focus){ alpha = 0.9;    }
         }
         var sides_indices = cube.getSidesFromVertex(nearest_indices);
-        //if(cube.constructor.name == "Door" && cube.opened){}
-        //else{
+
+        /*if(cube.constructor.name == "Character"){
+            graphics.paintCharacter(points[0], cube);
+        }else{*/
             this.colorCubeFromSides(graphics, points, sides_indices, cube.texturePath, alpha);
         //}
     }
@@ -606,7 +615,6 @@ move(delta_x,delta_y,delta_z, cubes){
         this.x += tangent_projection.x;
         this.y += tangent_projection.y;
         this.z += tangent_projection.z;
-        console.log(this.x + " " + this.z);
     }
 }
 

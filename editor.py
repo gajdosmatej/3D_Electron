@@ -212,6 +212,9 @@ class MyCanvas:
                 self.matrix[column, row] = self.mouse_brick
                 self.matrix[column, row].textureStr = "NULL"
 
+                self.canvas.create_line(self.mouse_brick.x+25, self.mouse_brick.y+25,
+                self.activeCharacter.path[-2][0]+25, self.activeCharacter.path[-2][1]+25);
+
             elif type( self.matrix[column, row] ).__name__ == "Character":
                 if self.matrix[column, row] == self.activeCharacter:
                     self.activeCharacter = None
