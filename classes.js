@@ -81,7 +81,7 @@ class Character{
         this.timer = setInterval(this.move.bind(this), 100);
       }
 
-      move(){
+    move(){
           var i = this.direction[0];
           var j = this.direction[1];
           var direction_vector = new Vector(this.path[j][0] - this.path[i][0], 0, this.path[j][1] - this.path[i][1]);
@@ -107,7 +107,7 @@ class Character{
           redraw();
       }
 
-      *getVerticesCoordinates(){
+    *getVerticesCoordinates(){
 
             var cos_phi = Math.cos(this.phi);
             var sin_phi = Math.sin(this.phi);
@@ -124,7 +124,7 @@ class Character{
           }
         }
 
-        getVerticesList(){
+    getVerticesList(){
             var list = [];
             for(let vertex of this.getVerticesCoordinates()){
                 list.push(vertex);
@@ -132,7 +132,7 @@ class Character{
             return list;
         }
 
-      *getRelativeVerticesCoordinates(){
+    *getRelativeVerticesCoordinates(){
             for(let x_modifier of [-1, 1]){
                 for(let y_modifier of [-1, 1]){
                     for(let z_modifier of [-1, 1]){
@@ -143,13 +143,13 @@ class Character{
             }}}
         }
 
-      getSidesFromVertex(vertex_indices){
+    getSidesFromVertex(vertex_indices){
           var sides = [[0,1,3,2], [4,5,7,6], [0,1,4,5], [2,3,6,7], [0,2,6,4], [1,3,7,5]];
           var selected_sides = sides.filter(side => vertex_indices.every(i => side.includes(i)));
           return selected_sides;
       }
 
-      getSidePointsFromPosition(camera_vector){
+    getSidePointsFromPosition(camera_vector){
           var relative_vector = new Vector(this.x, this.y, this.z).add(camera_vector.opposite());
           var points = this.getVerticesList();
 
@@ -176,7 +176,7 @@ class Character{
           return [point1, point2];
       }
 
-      getSideNormalVector(camera_vector){
+    getSideNormalVector(camera_vector){
           var side_points = this.getSidePointsFromPosition(camera_vector);
 
           var normal_vector = new Vector(side_points[1].z - side_points[0].z, 0, side_points[0].x - side_points[1].x);
@@ -191,6 +191,21 @@ class Character{
           return normal_vector;
       }
 
+    getNearestSide(camera_vector){
+        var sides = [[0,1,3,2], [4,5,7,6], [0,1,4,5], [2,3,6,7], [0,2,6,4], [1,3,7,5]];
+        var points = this.getVerticesList();
+        var totalDistance = indices => {
+                            var d = 0;
+                            for(var i=0; i<4; ++i){
+                                var point = points[indices[i]];
+                                d += (point.x - camera.x)**2 + (point.z - camera.z)**2;
+                            }
+                            return d;
+                        }
+        var distances = sides.map(totalDistance);
+        var closest_side = sides[Mathematics.getSmallestValueIndex(distances)];
+        return closest_side;
+      }
 }
 
 class Cube{
@@ -296,6 +311,7 @@ getSideNormalVector(camera_vector){
 
     return normal_vector;
 }
+
 }
 
 class Door extends Cube{
@@ -466,7 +482,7 @@ class ProjectionPlane{
   distance;
   r = 100;
 
-  constructor(w,h,d,r){
+constructor(w,h,d,r){
 
     this.width = w;
     this.height = h;
@@ -476,7 +492,7 @@ class ProjectionPlane{
   }
 
 
-  projectPoint(point, camera){
+projectPoint(point, camera){
 
     point = point.add(new Vector(-camera.x,-camera.y,-camera.z));
     var cos = Math.cos(-camera.phi);
@@ -493,7 +509,7 @@ class ProjectionPlane{
 
 projectCube(cube, camera, graphics){
     var points = [];
-    cube.getSideNormalVector(new Vector(camera.x, camera.y, camera.z));
+
     if(camera.isCubeInFieldOfView(cube)){
 
         var nearest_indices = [];
@@ -544,6 +560,59 @@ projectCube(cube, camera, graphics){
     }
 }
 
+projectCharacter(cube, camera, graphics){
+    var points = [];
+    //console.log(cube.getNearestSide(new Vector(camera.x, camera.y, camera.z)));
+    if(camera.isCubeInFieldOfView(cube)){
+
+        var nearest_indices = [];
+        var nearest_distance = null;
+        for(  let vertex_vector of cube.getVerticesCoordinates() ){
+
+            var intersect_point_plane = this.projectPoint(vertex_vector, camera);
+            graphics.drawPoint(intersect_point_plane[0], intersect_point_plane[1]);
+            points.push(intersect_point_plane);
+            //nejblizsi hrana
+            {
+              var displacement =
+                (vertex_vector.x - camera.x)**2 + (vertex_vector.y - camera.y)**2 + (vertex_vector.z - camera.z)**2;
+
+              if(nearest_distance == null || nearest_distance == displacement){
+                nearest_indices.push(points.length - 1);
+                nearest_distance = displacement;
+              }
+              else if(nearest_distance > displacement){
+                nearest_indices = [points.length - 1];
+                nearest_distance = displacement;
+              }
+            }
+
+        }
+
+        /*for(let i = 0; i < points.length; ++i){
+          for(let j = i+1; j < points.length; ++j){
+              graphics.drawLine(points[i], points[j]);
+          }
+      }*/
+
+        for(var v of [[0,1], [0,2], [1,3], [2,3], [0,4], [1,5], [2,6], [3,7], [4,5], [5,7], [6,7], [4,6]]){
+            graphics.drawLine(points[v[0]], points[v[1]]);
+        }
+
+        var alpha = 1;
+        if(cube.constructor.name == "Door"){
+            if(cube.focus){ alpha = 0.9;    }
+        }
+        //var sides_indices = cube.getSidesFromVertex(nearest_indices);
+        var side = cube.getNearestSide(new Vector(camera.x, camera.y, camera.z));
+        /*if(cube.constructor.name == "Character"){
+            graphics.paintCharacter(points[0], cube);
+        }else{*/
+        this.colorCharacterFromSides(graphics, points, side, cube.texturePath, alpha);
+        //}
+    }
+}
+
 getTetragonPoints(points, side){
 
     var tetragon_points = []; //RU -> RD -> LU -> LD
@@ -571,6 +640,24 @@ colorCubeFromSides(graphics, points, sides_indices, texturePath, alpha){
     //console.log(colors[col_index]);
     col_index += 1;
   }
+}
+
+colorCharacterFromSides(graphics, points, side, texturePath, alpha){
+    var tetragon_points = this.getTetragonPoints(points, side);
+    //var other_side = [0,1,2,3,4,5,6,7].filter(x => !side.includes(x) );
+
+    var all_sides = [[0,1,3,2], [4,5,7,6], [0,1,4,5], [2,3,6,7], [0,2,6,4], [1,3,7,5]];
+    var other_side = all_sides.filter(arr => Mathematics.intersect(arr, side).size == 0)[0];
+    var other_points = this.getTetragonPoints(points, other_side);
+
+    //tohle jeste spravne nefunguje
+    var middle_points = [];
+    for(var i=0; i<4; ++i){
+        middle_points.push( [(other_points[i][0] - tetragon_points[i][0]) / 2, (other_points[i][1] - tetragon_points[i][1]) / 2] );
+    }
+
+    graphics.fillTetragon(other_points[0], other_points[1], other_points[2], other_points[3], "#FF0000", texturePath, alpha)
+    //graphics.fillTetragon(middle_points[0], middle_points[1], middle_points[2], middle_points[3], "#FF0000", texturePath, alpha);
 }
 }
 

@@ -141,5 +141,10 @@ var Mathematics = {
             if(list[i] < smallest){ smallest = list[i]; index = i;  }
         }
         return index;
+    },
+
+    intersect(A, B){
+        B = new Set(B);
+        return new Set(A.filter(x => B.has(x)));
     }
 }

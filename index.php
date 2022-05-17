@@ -147,7 +147,12 @@ else{
                 focus_door = obj;
             }
         }
-        plane.projectCube(obj, camera, graphics);
+        if(obj.constructor.name == "Character"){
+            plane.projectCharacter(obj, camera, graphics);
+        }
+        else{
+            plane.projectCube(obj, camera, graphics);
+        }
     }
   }
 
