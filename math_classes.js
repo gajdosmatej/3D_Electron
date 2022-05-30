@@ -146,5 +146,9 @@ var Mathematics = {
     intersect(A, B){
         B = new Set(B);
         return new Set(A.filter(x => B.has(x)));
+    },
+
+    zip(arr1, arr2){
+      return arr1.map( (elem, index) => [elem, arr2[index]]);
     }
 }

@@ -10,3 +10,11 @@ function createWindow () {
 app.whenReady().then(() => {
   createWindow()
 })
+
+ipcMain.on("toMain", (event, args) => {
+  fs.readFile("./export.json", (error, data) => {
+    // Do something with file contents
+
+    // Send result back to renderer process
+    win.webContents.send("fromMain", responseObj);
+  });

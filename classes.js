@@ -552,11 +552,7 @@ projectCube(cube, camera, graphics){
         }
         var sides_indices = cube.getSidesFromVertex(nearest_indices);
 
-        /*if(cube.constructor.name == "Character"){
-            graphics.paintCharacter(points[0], cube);
-        }else{*/
-            this.colorCubeFromSides(graphics, points, sides_indices, cube.texturePath, alpha);
-        //}
+        this.colorCubeFromSides(graphics, points, sides_indices, cube.texturePath, alpha);
     }
 }
 
@@ -644,20 +640,19 @@ colorCubeFromSides(graphics, points, sides_indices, texturePath, alpha){
 
 colorCharacterFromSides(graphics, points, side, texturePath, alpha){
     var tetragon_points = this.getTetragonPoints(points, side);
-    //var other_side = [0,1,2,3,4,5,6,7].filter(x => !side.includes(x) );
 
     var all_sides = [[0,1,3,2], [4,5,7,6], [0,1,4,5], [2,3,6,7], [0,2,6,4], [1,3,7,5]];
     var other_side = all_sides.filter(arr => Mathematics.intersect(arr, side).size == 0)[0];
     var other_points = this.getTetragonPoints(points, other_side);
 
-    //tohle jeste spravne nefunguje
-    var middle_points = [];
+    /*var middle_points = [];
     for(var i=0; i<4; ++i){
-        middle_points.push( [(other_points[i][0] - tetragon_points[i][0]) / 2, (other_points[i][1] - tetragon_points[i][1]) / 2] );
-    }
+        middle_points.push( [(other_points[i][0] + tetragon_points[i][0]) / 2, (other_points[i][1] + tetragon_points[i][1]) / 2] );
+    }*/
+    var middle_points = Mathematics.zip(tetragon_points, other_points);
+    middle_points = middle_points.map(couple => [ (couple[0][0] + couple[1][0])/2, (couple[0][1] + couple[1][1])/2 ]);
 
-    graphics.fillTetragon(other_points[0], other_points[1], other_points[2], other_points[3], "#FF0000", texturePath, alpha)
-    //graphics.fillTetragon(middle_points[0], middle_points[1], middle_points[2], middle_points[3], "#FF0000", texturePath, alpha);
+    graphics.fillTetragon(middle_points[0], middle_points[1], middle_points[2], middle_points[3], "#FF0000", texturePath, alpha);
 }
 }
 
