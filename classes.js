@@ -63,7 +63,8 @@ class Character{
     side_len;
     phi;
     map_coord;
-    texturePath = "textures/character.png";
+    texturePath = "character/right1.png";
+    animation_number = 1;
     path;
     timer;
     direction = [0,1];
@@ -104,7 +105,13 @@ class Character{
                     this.direction[1] += this.direction_increment;
                 }
             }
+
+            if(this.animation_number < 3){  this.animation_number++; }
+            else{   this.animation_number = 1;  }
+            this.texturePath = "character/forward" + this.animation_number + ".png";
+
           redraw();
+
       }
 
     *getVerticesCoordinates(){
