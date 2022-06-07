@@ -150,5 +150,14 @@ var Mathematics = {
 
     zip(arr1, arr2){
       return arr1.map( (elem, index) => [elem, arr2[index]]);
+  },
+
+    getIndex(array, element){
+        var len = array.length;
+        for(let i = 0; i < len; ++i){
+
+            if( JSON.stringify(array[i]) == JSON.stringify(element) ){   return i;   }
+        }
+        return -1;
     }
 }

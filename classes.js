@@ -63,7 +63,7 @@ class Character{
     side_len;
     phi;
     map_coord;
-    texturePath = "character/right1.png";
+    texturePath = "character/forward1.png";
     animation_number = 1;
     path;
     timer;
@@ -112,6 +112,15 @@ class Character{
 
           redraw();
 
+      }
+
+      getDirectionArray(){
+          var i = this.direction[0];
+          var j = this.direction[1];
+          var direction_vector = new Vector(this.path[j][0] - this.path[i][0], 0, this.path[j][1] - this.path[i][1]);
+          direction_vector = direction_vector.multiply(1 / direction_vector.getNorm());
+
+          return [direction_vector.x, direction_vector.z];
       }
 
     *getVerticesCoordinates(){
@@ -369,7 +378,6 @@ drawPoint(x,y){
 paintCharacter(coord, character){
     var texture = new Image();
     texture.src = character.texturePath;
-    console.log(coord);
     this.ctx.drawImage(texture, coord[0] + this.offset[0], coord[1] + this.offset[1], character.side_len, character.side_len);
 }
 
@@ -563,6 +571,25 @@ projectCube(cube, camera, graphics){
     }
 }
 
+chooseCharacterTexture(cube, camera){
+
+    //console.log(cube.getSideNormalVector( new Vector(camera.x, camera.y, camera.z)));
+    var nearest_normal = cube.getSideNormalVector( new Vector(camera.x, camera.y, camera.z));
+    var normal_arr = [nearest_normal.x, nearest_normal.z];
+
+    var direction = cube.getDirectionArray();
+
+    var whole_matrix = [[1,0], [0,1], [-1,0], [0,-1], [1,0], [0,1], [-1,0], [0,-1]];
+    var whole_index = Mathematics.getIndex(whole_matrix, direction);
+    var matrix = whole_matrix.slice(whole_index, whole_index + 4);
+
+    var side_index = Mathematics.getIndex(matrix, normal_arr);
+    var sides = ["back", "left", "forward", "right"];
+
+    return "character/" + sides[side_index];
+
+}
+
 projectCharacter(cube, camera, graphics){
     var points = [];
     //console.log(cube.getNearestSide(new Vector(camera.x, camera.y, camera.z)));
@@ -570,10 +597,13 @@ projectCharacter(cube, camera, graphics){
 
         var nearest_indices = [];
         var nearest_distance = null;
+
+        cube.texturePath = this.chooseCharacterTexture(cube, camera) + cube.animation_number + ".png";
+
         for(  let vertex_vector of cube.getVerticesCoordinates() ){
 
             var intersect_point_plane = this.projectPoint(vertex_vector, camera);
-            graphics.drawPoint(intersect_point_plane[0], intersect_point_plane[1]);
+            //graphics.drawPoint(intersect_point_plane[0], intersect_point_plane[1]);
             points.push(intersect_point_plane);
             //nejblizsi hrana
             {
@@ -598,9 +628,9 @@ projectCharacter(cube, camera, graphics){
           }
       }*/
 
-        for(var v of [[0,1], [0,2], [1,3], [2,3], [0,4], [1,5], [2,6], [3,7], [4,5], [5,7], [6,7], [4,6]]){
+        /*for(var v of [[0,1], [0,2], [1,3], [2,3], [0,4], [1,5], [2,6], [3,7], [4,5], [5,7], [6,7], [4,6]]){
             graphics.drawLine(points[v[0]], points[v[1]]);
-        }
+        }*/
 
         var alpha = 1;
         if(cube.constructor.name == "Door"){
