@@ -449,6 +449,49 @@ fillTetragon(coord1, coord2, coord3, coord4, color, texturePath, alpha){
 
   }
 
+fillFloor(coord1, coord2, coord3, coord4, texturePath){
+
+  
+this.ctx.beginPath();
+this.ctx.fillStyle = "brown"; // Purple path
+this.ctx.moveTo(coord1[0]+this.offset[0], coord1[1]+this.offset[1]);
+this.ctx.lineTo(coord2[0]+this.offset[0], coord2[1]+this.offset[1]);
+this.ctx.lineTo(coord4[0]+this.offset[0], coord4[1]+this.offset[1]);
+this.ctx.lineTo(coord3[0]+this.offset[0], coord3[1]+this.offset[1]);
+this.ctx.lineTo(coord1[0]+this.offset[0], coord1[1]+this.offset[1]); 
+this.ctx.fill();
+this.ctx.closePath();
+/*
+  var texture = new Image();
+  texture.src = texturePath;
+
+    var L0 = 200;
+    var Lx = Math.abs(coord3[0] - coord1[0]);
+    var Ly = Math.abs(coord4[1] - coord3[1]);
+    var n_clips = 20;
+    var dx0 = L0 / n_clips;
+    var dx = Lx / n_clips;
+    var tg0 = Math.abs(coord3[1] - coord1[1]) / L0;   //budou znamenka jmenovatelu ok?
+    var tg = (coord3[1] - coord1[1]) / (coord3[0] - coord1[0]);
+
+    for(let i = 0; i < n_clips; ++i){
+
+        var x0 = i*dx0;
+        var w0 = dx0;
+        //var y0 = x0 * tg0;
+        var y0 = 0;
+        var h0 = L0;
+        //var h0 = L0 - 2*y0;
+        var x = i*dx;
+        var w = dx;
+        var y = -x*tg;
+        var h = Ly - 2*y; //console.log(h);
+
+        //this.ctx.drawImage(texture, x0, y0, w0, h0, coord4[0] + x + this.offset[0] + 1, y + coord4[1] + this.offset[1], w, h);
+    }*/
+
+}
+
 drawLine(coord_1, coord_2){
 
     this.ctx.beginPath();
@@ -606,17 +649,20 @@ projectFloor(cube, camera, graphics){
           }
       }*/
 
-        for(var v of [[0,1], [0,2], [1,3], [2,3], [0,4], [1,5], [2,6], [3,7], [4,5], [5,7], [6,7], [4,6]]){
+        /*for(var v of [[0,1], [0,2], [1,3], [2,3], [0,4], [1,5], [2,6], [3,7], [4,5], [5,7], [6,7], [4,6]]){
             graphics.drawLine(points[v[0]], points[v[1]]);
+        }*/
+
+        var sortFunc = (a, b) => a[1] - b[1];
+        points = points.sort(sortFunc).slice(0,4);
+
+        for(var v of [[0,1], [0,2], [1,3], [2,3]]){
+          graphics.drawLine(points[v[0]], points[v[1]]);
         }
 
-        var alpha = 1;
-        if(cube.constructor.name == "Door"){
-            if(cube.focus){ alpha = 0.9;    }
-        }
         var sides_indices = cube.getSidesFromVertex(nearest_indices);
-
-        //this.colorCubeFromSides(graphics, points, sides_indices, cube.texturePath, alpha);
+        var sorted_coord = this.getTetragonPoints(points, [0,1,2,3]);
+        graphics.fillFloor(sorted_coord[0], sorted_coord[1], sorted_coord[2], sorted_coord[3], cube.texturePath);
     }
 }
 
@@ -836,13 +882,13 @@ isCubeInFieldOfView(cube){
 
 getFloorCubes(){
   var cubes = [];
-  var size = 350;
-  var y = 200;
+  var size = 150;
+  var y = 100;
   var i_arr;
   var j_arr;
 
-  if(Math.cos(this.phi) >= 0){  i_arr = [-1,0,1,2,3,4]; }  else{ i_arr = [-4,-3,-2,-1,0,1];  }
-  if(Math.sin(this.phi) >= 0){  j_arr = [-1,0,1,2,3,4];  }else{  j_arr = [-4,-3,-2,-1,0,1];  }
+  if(Math.cos(this.phi) >= 0){  i_arr = [-1,0,1,2,3,4,5,6,7]; }  else{ i_arr = [-7,-6,-5,-4,-3,-2,-1,0,1];  }
+  if(Math.sin(this.phi) >= 0){  j_arr = [-1,0,1,2,3,4,5,6,7];  }else{  j_arr = [-7,-6,-5,-4,-3,-2,-1,0,1];  }
 
   var x_multiplier = Math.floor(this.x / size);
   var z_multiplier = Math.floor(this.z / size);
