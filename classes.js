@@ -11,7 +11,7 @@ class Level{
         var max_x_index = Mathematics.getSmallestValueIndex(xs.map(obj => -obj));
         var min_z_index = Mathematics.getSmallestValueIndex(zs);
         var max_z_index = Mathematics.getSmallestValueIndex(zs.map(obj => -obj));
-
+        
         var min_x = object_list[min_x_index].x;
         var min_z = object_list[min_z_index].z;
         var max_x = object_list[max_x_index].x;
@@ -571,6 +571,55 @@ projectCube(cube, camera, graphics){
     }
 }
 
+projectFloor(cube, camera, graphics){
+  var points = [];
+
+    if(camera.isCubeInFieldOfView(cube)){
+
+        var nearest_indices = [];
+        var nearest_distance = null;
+        for(  let vertex_vector of cube.getVerticesCoordinates() ){
+
+            var intersect_point_plane = this.projectPoint(vertex_vector, camera);
+            graphics.drawPoint(intersect_point_plane[0], intersect_point_plane[1]);
+            points.push(intersect_point_plane);
+            //nejblizsi hrana
+            {
+              var displacement =
+                (vertex_vector.x - camera.x)**2 + (vertex_vector.y - camera.y)**2 + (vertex_vector.z - camera.z)**2;
+
+              if(nearest_distance == null || nearest_distance == displacement){
+                nearest_indices.push(points.length - 1);
+                nearest_distance = displacement;
+              }
+              else if(nearest_distance > displacement){
+                nearest_indices = [points.length - 1];
+                nearest_distance = displacement;
+              }
+            }
+
+        }
+
+        /*for(let i = 0; i < points.length; ++i){
+          for(let j = i+1; j < points.length; ++j){
+              graphics.drawLine(points[i], points[j]);
+          }
+      }*/
+
+        for(var v of [[0,1], [0,2], [1,3], [2,3], [0,4], [1,5], [2,6], [3,7], [4,5], [5,7], [6,7], [4,6]]){
+            graphics.drawLine(points[v[0]], points[v[1]]);
+        }
+
+        var alpha = 1;
+        if(cube.constructor.name == "Door"){
+            if(cube.focus){ alpha = 0.9;    }
+        }
+        var sides_indices = cube.getSidesFromVertex(nearest_indices);
+
+        //this.colorCubeFromSides(graphics, points, sides_indices, cube.texturePath, alpha);
+    }
+}
+
 chooseCharacterTexture(cube, camera){
 
     //console.log(cube.getSideNormalVector( new Vector(camera.x, camera.y, camera.z)));
@@ -784,7 +833,30 @@ isCubeInFieldOfView(cube){
       }
       return false;
   }
+
+getFloorCubes(){
+  var cubes = [];
+  var size = 350;
+  var y = 200;
+  var i_arr;
+  var j_arr;
+
+  if(Math.cos(this.phi) >= 0){  i_arr = [-1,0,1,2,3,4]; }  else{ i_arr = [-4,-3,-2,-1,0,1];  }
+  if(Math.sin(this.phi) >= 0){  j_arr = [-1,0,1,2,3,4];  }else{  j_arr = [-4,-3,-2,-1,0,1];  }
+
+  var x_multiplier = Math.floor(this.x / size);
+  var z_multiplier = Math.floor(this.z / size);
+
+  for(let i of i_arr){
+    for(let j of j_arr){
+        cubes.push( new Cube(x_multiplier*size + i*size, y, z_multiplier*size + j*size, size, "textures/StoneWall.jpg") );
+    }
+  }
+  return cubes;
 }
+
+}
+
 
 
 function Debug(info){

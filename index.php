@@ -133,10 +133,16 @@ else{
 
   var focus_door = null;
 
+
   function project(){
 
     if(focus_door != null){ focus_door.focus = false;   }
     focus_door = null;
+
+    for(floor_cube of camera.getFloorCubes()){  plane.projectFloor(floor_cube, camera, graphics);   }
+
+    /*plane.projectFloor(new Cube(700,0,700,50,"textures/StoneWall.jpg"), camera, graphics);
+    plane.projectFloor(new Cube(700,100,700,150,"textures/StoneWall.jpg"), camera, graphics);*/
 
     for(obj of objects){
 
