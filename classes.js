@@ -452,15 +452,15 @@ fillTetragon(coord1, coord2, coord3, coord4, color, texturePath, alpha){
 fillFloor(coord1, coord2, coord3, coord4, texturePath){
 
   
-this.ctx.beginPath();
-this.ctx.fillStyle = "brown"; // Purple path
-this.ctx.moveTo(coord1[0]+this.offset[0], coord1[1]+this.offset[1]);
-this.ctx.lineTo(coord2[0]+this.offset[0], coord2[1]+this.offset[1]);
-this.ctx.lineTo(coord4[0]+this.offset[0], coord4[1]+this.offset[1]);
-this.ctx.lineTo(coord3[0]+this.offset[0], coord3[1]+this.offset[1]);
-this.ctx.lineTo(coord1[0]+this.offset[0], coord1[1]+this.offset[1]); 
-this.ctx.fill();
-this.ctx.closePath();
+  this.ctx.beginPath();
+  this.ctx.fillStyle = "#AAA";
+  this.ctx.moveTo(coord1[0]+this.offset[0], coord1[1]+this.offset[1]);
+  this.ctx.lineTo(coord2[0]+this.offset[0], coord2[1]+this.offset[1]);
+  this.ctx.lineTo(coord4[0]+this.offset[0], coord4[1]+this.offset[1]);
+  this.ctx.lineTo(coord3[0]+this.offset[0], coord3[1]+this.offset[1]);
+  this.ctx.lineTo(coord1[0]+this.offset[0], coord1[1]+this.offset[1]); 
+  this.ctx.fill();
+  this.ctx.closePath();
 /*
   var texture = new Image();
   texture.src = texturePath;
@@ -653,7 +653,7 @@ projectFloor(cube, camera, graphics){
             graphics.drawLine(points[v[0]], points[v[1]]);
         }*/
 
-        var sortFunc = (a, b) => a[1] - b[1];
+        if(cube.y > 0){ var sortFunc = (a, b) => a[1] - b[1]; }else{  var sortFunc = (a, b) => b[1] - a[1]; }
         points = points.sort(sortFunc).slice(0,4);
 
         for(var v of [[0,1], [0,2], [1,3], [2,3]]){
@@ -896,6 +896,7 @@ getFloorCubes(){
   for(let i of i_arr){
     for(let j of j_arr){
         cubes.push( new Cube(x_multiplier*size + i*size, y, z_multiplier*size + j*size, size, "textures/StoneWall.jpg") );
+        cubes.push( new Cube(x_multiplier*size + i*size, -y, z_multiplier*size + j*size, size, "textures/StoneWall.jpg") );
     }
   }
   return cubes;
